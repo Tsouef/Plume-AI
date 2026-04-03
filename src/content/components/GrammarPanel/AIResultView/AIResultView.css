@@ -1,0 +1,58 @@
+/* ─── AIResultView ───────────────────────────────────────────────────────── */
+
+.ai-result {
+  padding: 11px 13px;
+  color: var(--text-primary);
+  font-style: italic;
+  background: rgba(14, 165, 233, 0.06);
+  border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* ─── Actions bar ────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  gap: 7px;
+  padding: 9px 13px;
+  background: rgba(10, 11, 16, 0.4);
+  border-top: 1px solid var(--border-primary);
+}
+
+.btn-primary {
+  padding: 4px 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+  color: #0a0b10;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: filter 120ms ease, box-shadow 120ms ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.btn-secondary {
+  padding: 4px 11px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.07);
+}

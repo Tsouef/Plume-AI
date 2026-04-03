@@ -1,0 +1,37 @@
+/* ─── ApiKeySection ──────────────────────────────────────────────────────── */
+
+.inputRow {
+  display: flex;
+  gap: 7px;
+}
+
+.inputRow input {
+  flex: 1;
+}
+
+.btnIcon {
+  flex-shrink: 0;
+  width: 34px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 150ms ease, color 150ms ease;
+  padding: 0;
+}
+
+.btnIcon:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.errorMsg {
+  font-size: 11px;
+  color: var(--danger);
+  margin-top: 5px;
+}

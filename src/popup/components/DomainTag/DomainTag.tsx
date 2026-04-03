@@ -1,0 +1,15 @@
+import styles from './DomainTag.module.css'
+
+interface DomainTagProps {
+  domain: string
+  onRemove: () => void
+}
+
+export function DomainTag({ domain, onRemove }: DomainTagProps) {
+  return (
+    <div className={styles.domainTag}>
+      {domain}
+      <button onClick={onRemove} title={`Remove ${domain}`}>×</button>
+    </div>
+  )
+}

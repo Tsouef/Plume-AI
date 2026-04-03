@@ -1,0 +1,9 @@
+/* ─── SavedMessage ───────────────────────────────────────────────────────── */
+
+.savedMsg {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+}

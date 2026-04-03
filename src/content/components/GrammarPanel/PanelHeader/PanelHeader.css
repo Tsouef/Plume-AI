@@ -1,0 +1,66 @@
+/* ─── PanelHeader ────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  background: rgba(10, 11, 16, 0.5);
+  border-bottom: 1px solid var(--border-primary);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.header .status {
+  flex: 1;
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Status icons ───────────────────────────────────────────────────────── */
+
+.status-icon {
+  font-size: 12px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.status-icon.success { color: var(--success); }
+.status-icon.warning { color: var(--warning); }
+.status-icon.error   { color: var(--danger); }
+.status-icon.info    { color: var(--accent-blue); }
+
+/* ─── Improve button ─────────────────────────────────────────────────────── */
+
+.btn-improve {
+  padding: 4px 11px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-blue));
+  color: #0a0b10;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: filter 120ms ease, box-shadow 120ms ease;
+  letter-spacing: -0.01em;
+}
+
+.btn-improve:hover:not(:disabled) {
+  filter: brightness(1.12);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.btn-improve:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  cursor: default;
+  box-shadow: none;
+  filter: none;
+}
