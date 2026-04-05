@@ -39,7 +39,7 @@ Apply the rules of the detected language strictly. Look for:
 - Wrong word choice: a word exists in the language but is used with the wrong meaning — including false cognates caused by interference from another language (e.g. a word borrowed from another language but used with the meaning it has there, not in this language)
 - Missing or extra words that break grammatical structure
 
-Be strict: if a phrase is grammatically wrong in the target language, flag it — even if it is understandable or common among non-native speakers.
+Be strict and exhaustive: scan every word and phrase. Flag ALL errors, including basic spelling mistakes, non-standard words (e.g. "irregardless"), compound words written as one (e.g. "noone" → "no one"), and double comparatives (e.g. "more earlier"). Do not stop after finding a few — check the entire text word by word.
 
 Do NOT:
 - Suggest translating words into another language
@@ -92,10 +92,11 @@ export function buildTranslatePrompt(text: string, targetLanguage: string): stri
 }
 
 const TONE_INSTRUCTIONS: Record<TonePreset, string> = {
-  shorter:   'Rewrite more concisely, keeping the same meaning.',
-  formal:    'Rewrite in a more formal, professional tone.',
-  direct:    'Rewrite more directly, remove any hedging or filler.',
-  technical: 'Rewrite using precise technical language.',
+  shorter:      'Rewrite more concisely, keeping the same meaning.',
+  formal:       'Rewrite in a more formal, professional tone.',
+  direct:       'Rewrite more directly, remove any hedging or filler.',
+  technical:    'Rewrite using precise technical language.',
+  'grammar-fix': 'Fix every grammar, spelling, and word-choice error. Do not change the style, tone, structure, or meaning — only correct mistakes.',
 }
 
 export function buildToneRewritePrompt(

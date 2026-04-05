@@ -111,7 +111,7 @@ describe('GrammarPanel — error display', () => {
     expect(marks[1].textContent).toBe('informations')
   })
 
-  it('error highlight has tooltip with message and replacement', () => {
+  it('error highlight shows inline annotation with replacement', () => {
     renderPanel({
       state: {
         type: 'results',
@@ -119,8 +119,11 @@ describe('GrammarPanel — error display', () => {
         fieldText: 'context with feedbacks',
       },
     })
-    const mark = document.querySelector('mark.error-highlight') as HTMLElement
-    expect(mark.title).toBe('test error → feedback')
+    const group = document.querySelector('.error-group') as HTMLElement
+    const mark = group.querySelector('mark.error-highlight')
+    const annotation = group.querySelector('.error-annotation')
+    expect(mark?.textContent).toBe('feedbacks')
+    expect(annotation?.textContent).toBe(' → feedback')
   })
 
   it('shows text preview when there are errors', () => {
@@ -155,7 +158,7 @@ describe('GrammarPanel — error display', () => {
     expect(document.querySelector('.btn-primary')).toBeNull()
   })
 
-  it('Fix all calls onApplyAI with the fully corrected text', async () => {
+  it('Fix all triggers AI rewrite with grammar-fix tone', async () => {
     const props = renderPanel({
       state: {
         type: 'results',
@@ -164,22 +167,7 @@ describe('GrammarPanel — error display', () => {
       },
     })
     await userEvent.click(screen.getByText('Fix all'))
-    expect(props.onApplyAI).toHaveBeenCalledWith(
-      'context with feedback and context with information',
-      false
-    )
-  })
-
-  it('Fix all calls onClose after applying all fixes', async () => {
-    const props = renderPanel({
-      state: {
-        type: 'results',
-        errors: [makeError('feedbacks', 'feedback')],
-        fieldText: 'context with feedbacks',
-      },
-    })
-    await userEvent.click(screen.getByText('Fix all'))
-    expect(props.onClose).toHaveBeenCalledTimes(1)
+    expect(props.onRequestAI).toHaveBeenCalledWith('grammar-fix')
   })
 })
 

@@ -24,7 +24,7 @@ export interface GrammarError {
   context: string       // 4–8 word surrounding phrase used to locate original
 }
 
-export type TonePreset = 'shorter' | 'formal' | 'direct' | 'technical'
+export type TonePreset = 'shorter' | 'formal' | 'direct' | 'technical' | 'grammar-fix'
 
 export interface CheckGrammarMessage {
   type: 'CHECK_GRAMMAR'

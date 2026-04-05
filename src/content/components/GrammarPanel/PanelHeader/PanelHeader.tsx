@@ -5,11 +5,12 @@ import { Spinner } from '../Spinner/Spinner'
 
 interface PanelHeaderProps {
   state: PanelState
+  matchedErrorCount?: number
   onRequestAI: (tone?: TonePreset) => void
   onOpenSettings?: () => void
 }
 
-export function PanelHeader({ state, onRequestAI, onOpenSettings }: PanelHeaderProps) {
+export function PanelHeader({ state, matchedErrorCount, onRequestAI, onOpenSettings }: PanelHeaderProps) {
   const { t } = useTranslation()
 
   function renderStatus() {
@@ -85,13 +86,14 @@ export function PanelHeader({ state, onRequestAI, onOpenSettings }: PanelHeaderP
     }
 
     if (state.type === 'results') {
-      if (state.errors.length === 0) {
+      const count = matchedErrorCount ?? state.errors.length
+      if (count === 0) {
         return <span className="status">✅ {t('panel.looksGood')}</span>
       }
       return (
         <span className="status">
           <span className="status-icon warning">●</span>
-          {` ${t('panel.issueCount', { count: state.errors.length })}`}
+          {` ${t('panel.issueCount', { count })}`}
         </span>
       )
     }

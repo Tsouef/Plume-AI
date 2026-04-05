@@ -3,7 +3,7 @@ export const MAX_Z_INDEX = 2147483647
 export const SAVED_VISIBLE_DURATION_MS = 2000
 export const EXTENSION_ERROR_MSG = 'Extension error'
 export const EXTENSION_INVALIDATED_MSG = 'Extension updated — please refresh the page'
-export const REQUEST_TIMEOUT_MS = 20000
+export const REQUEST_TIMEOUT_MS = 45000
 export const RATE_LIMIT_BACKOFF_MS = 5000
 export const MAX_GRAMMAR_TEXT_LENGTH = 3000
 

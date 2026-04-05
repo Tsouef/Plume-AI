@@ -22,7 +22,7 @@ async function callClaude(prompt: string, apiKey: string, model: string): Promis
       },
       body: JSON.stringify({
         model,
-        max_tokens: 1024,
+        max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       }),
       signal: controller.signal,

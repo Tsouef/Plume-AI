@@ -31,24 +31,17 @@ interface GrammarPanelProps {
 }
 
 interface ErrorSectionProps {
-  fieldText: string
-  errors: GrammarError[]
-  onApplyAI: (rewritten: string, isSelection: boolean) => void
-  onClose: () => void
+  segments: ReturnType<typeof buildSegments>
+  onRequestAI: (tone?: TonePreset) => void
 }
 
-function ErrorSection({ fieldText, errors, onApplyAI, onClose }: ErrorSectionProps) {
+function ErrorSection({ segments, onRequestAI }: ErrorSectionProps) {
   const { t } = useTranslation()
-  const segments = useMemo(() => buildSegments(fieldText, errors), [fieldText, errors])
   return (
     <>
       <TextPreview segments={segments} />
       <div className="actions">
-        <button className="btn-primary" onClick={() => {
-          const corrected = segments.map(s => s.error ? s.error.replacement : s.text).join('')
-          onApplyAI(corrected, false)
-          onClose()
-        }}>
+        <button className="btn-primary" onClick={() => onRequestAI('grammar-fix')}>
           {t('panel.fixAll')}
         </button>
       </div>
@@ -60,6 +53,14 @@ export const GrammarPanel = memo(forwardRef<GrammarPanelHandle, GrammarPanelProp
   ({ isOpen, state, field, onRequestAI, onApplyAI, onRequestTranslate, onClose, onDismiss, onOpenSettings }, ref) => {
     const { t } = useTranslation()
     const shadowRef = useRef<ShadowPortalHandle>(null)
+
+    const segments = useMemo(
+      () => state.type === 'results' && state.errors.length > 0
+        ? buildSegments(state.fieldText, state.errors)
+        : null,
+      [state]
+    )
+    const matchedErrorCount = segments ? segments.filter(s => s.error).length : undefined
     const [hostStyle, setHostStyle] = useState<CSSProperties>({
       position: 'fixed',
       zIndex: MAX_Z_INDEX,
@@ -135,6 +136,7 @@ export const GrammarPanel = memo(forwardRef<GrammarPanelHandle, GrammarPanelProp
             >
               <PanelHeader
                 state={state}
+                matchedErrorCount={matchedErrorCount}
                 onRequestAI={onRequestAI}
                 onOpenSettings={onOpenSettings}
               />
@@ -143,12 +145,10 @@ export const GrammarPanel = memo(forwardRef<GrammarPanelHandle, GrammarPanelProp
                 <TonePillsBar onSelectTone={onRequestAI} />
               )}
 
-              {state.type === 'results' && state.errors.length > 0 && (
+              {segments && segments.some(s => s.error) && (
                 <ErrorSection
-                  fieldText={state.fieldText}
-                  errors={state.errors}
-                  onApplyAI={onApplyAI}
-                  onClose={onClose}
+                  segments={segments}
+                  onRequestAI={onRequestAI}
                 />
               )}
 

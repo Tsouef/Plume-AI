@@ -9,13 +9,11 @@ export function TextPreview({ segments }: TextPreviewProps) {
     <div className="text-preview">
       {segments.map((seg, i) =>
         seg.error ? (
-          <mark
-            key={i}
-            className="error-highlight"
-            title={`${seg.error.message} → ${seg.error.replacement}`}
-          >
-            {seg.text}
-          </mark>
+          <span key={i} className="error-group">
+            <mark className="error-highlight">{seg.text}</mark>
+            <span className="error-annotation"> → {seg.error.replacement}</span>
+            <span className="error-reason">{seg.error.message}</span>
+          </span>
         ) : (
           seg.text
         )
