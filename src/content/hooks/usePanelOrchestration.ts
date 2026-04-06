@@ -8,7 +8,8 @@ import { applyAI } from '../utils/text-apply'
 import { sendBackgroundMessage } from '../utils/messaging'
 import type { GrammarPanelHandle } from '../components/GrammarPanel/GrammarPanel'
 import type { Config, TonePreset, TranslateMessage, TranslateResponse } from '../../shared/types'
-import { toErrorMessage } from '../../shared/constants'
+import { toErrorMessage, MAX_GRAMMAR_TEXT_LENGTH } from '../../shared/constants'
+import i18n from '../../shared/i18n/i18n'
 
 export function usePanelOrchestration(config: Config) {
   const panelRef = useRef<GrammarPanelHandle>(null)
@@ -122,11 +123,16 @@ export function usePanelOrchestration(config: Config) {
     (targetLang: string) => {
       const field = panelFieldRef.current
       if (!field) return
+      const text = field.textContent ?? ''
+      if (text.length > MAX_GRAMMAR_TEXT_LENGTH) {
+        panelState.setError(i18n.t('error.textTooLong', { max: MAX_GRAMMAR_TEXT_LENGTH }))
+        return
+      }
       panelState.setTranslating()
       const myId = ++translateRequestIdRef.current
       const message: TranslateMessage = {
         type: 'TRANSLATE',
-        text: field.textContent ?? '',
+        text,
         targetLanguage: targetLang,
       }
       sendBackgroundMessage<TranslateResponse>(message)
@@ -136,7 +142,8 @@ export function usePanelOrchestration(config: Config) {
         })
         .catch((err) => {
           if (myId !== translateRequestIdRef.current) return
-          panelState.setError(toErrorMessage(err))
+          const msg = toErrorMessage(err)
+          panelState.setError(msg === 'RATE_LIMIT' ? i18n.t('error.rateLimited') : msg)
         })
     },
     [panelState]

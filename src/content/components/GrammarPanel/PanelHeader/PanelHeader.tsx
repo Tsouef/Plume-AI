@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { TonePreset } from '../../../../shared/types'
+import { TonePreset, ProviderId } from '../../../../shared/types'
 import { PanelState } from '../../../hooks/usePanelState'
 import { Spinner } from '../Spinner/Spinner'
 
 interface PanelHeaderProps {
   state: PanelState
   matchedErrorCount?: number
+  activeProvider: ProviderId
   onRequestAI: (tone?: TonePreset) => void
   onOpenSettings?: () => void
 }
@@ -13,6 +14,7 @@ interface PanelHeaderProps {
 export function PanelHeader({
   state,
   matchedErrorCount,
+  activeProvider,
   onRequestAI,
   onOpenSettings,
 }: PanelHeaderProps) {
@@ -115,6 +117,9 @@ export function PanelHeader({
         <button className="btn-improve" onClick={() => onRequestAI(undefined)}>
           {t('panel.improve')}
         </button>
+      )}
+      {activeProvider === 'ollama' && (
+        <span className="local-mode-badge">{t('panel.localMode')}</span>
       )}
     </div>
   )

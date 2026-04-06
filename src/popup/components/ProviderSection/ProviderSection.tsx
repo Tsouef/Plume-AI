@@ -1,6 +1,11 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './ProviderSection.module.css'
-import type { ProviderId } from '../../../shared/types'
+import type {
+  ProviderId,
+  TestConnectionMessage,
+  TestConnectionResponse,
+} from '../../../shared/types'
 import {
   PROVIDER_MODELS,
   PROVIDER_LABELS,
@@ -39,6 +44,45 @@ export function ProviderSection({
   const state = providerStates[activeProvider]
   const isOllama = activeProvider === 'ollama'
 
+  type TestStatus = 'idle' | 'testing' | 'ok' | 'error'
+  const [testResult, setTestResult] = useState<{
+    status: TestStatus
+    error: string
+    testedKey: string
+  }>({ status: 'idle', error: '', testedKey: '' })
+
+  // Derive display state: result is stale if the key/provider changed since last test
+  const currentKey = `${activeProvider}|${state.apiKey}|${state.baseUrl}`
+  const testStatus = testResult.testedKey === currentKey ? testResult.status : 'idle'
+  const testError = testResult.testedKey === currentKey ? testResult.error : ''
+
+  async function handleTest() {
+    setTestResult({ status: 'testing', error: '', testedKey: currentKey })
+    const msg: TestConnectionMessage = {
+      type: 'TEST_CONNECTION',
+      providerId: activeProvider,
+      apiKey: state.apiKey || undefined,
+      model: state.model || undefined,
+      baseUrl: state.baseUrl || undefined,
+    }
+    try {
+      const response: TestConnectionResponse = await chrome.runtime.sendMessage(msg)
+      if (response.ok) {
+        setTestResult({ status: 'ok', error: '', testedKey: currentKey })
+      } else {
+        setTestResult({ status: 'error', error: response.error, testedKey: currentKey })
+      }
+    } catch {
+      setTestResult({
+        status: 'error',
+        error: t('popup.testConnectionError'),
+        testedKey: currentKey,
+      })
+    }
+  }
+
+  const showTestBtn = isOllama || !!state.apiKey
+
   return (
     <div className="section">
       {/* Provider selector */}
@@ -71,8 +115,25 @@ export function ProviderSection({
               value={state.apiKey}
               onChange={(e) => onStateChange(activeProvider, { apiKey: e.target.value })}
             />
+            {showTestBtn && (
+              <button
+                className={styles.testBtn}
+                onClick={handleTest}
+                disabled={testStatus === 'testing'}
+              >
+                {testStatus === 'testing' ? '…' : t('popup.testConnection')}
+              </button>
+            )}
           </div>
           {errors.apiKey && <p className={styles.errorMsg}>{t('popup.apiKeyRequired')}</p>}
+          {testStatus === 'ok' && (
+            <p className={`${styles.testResult} ${styles.ok}`}>✓ {t('popup.testConnectionOk')}</p>
+          )}
+          {testStatus === 'error' && (
+            <p className={`${styles.testResult} ${styles.error}`}>
+              {testError || t('popup.testConnectionError')}
+            </p>
+          )}
         </div>
       )}
 
@@ -82,14 +143,31 @@ export function ProviderSection({
           <label className="label" htmlFor="base-url">
             {t('popup.baseUrl')}
           </label>
-          <input
-            type="text"
-            id="base-url"
-            placeholder="http://localhost:11434"
-            value={state.baseUrl}
-            onChange={(e) => onStateChange('ollama', { baseUrl: e.target.value })}
-          />
+          <div className={styles.inputRow}>
+            <input
+              type="text"
+              id="base-url"
+              placeholder="http://localhost:11434"
+              value={state.baseUrl}
+              onChange={(e) => onStateChange('ollama', { baseUrl: e.target.value })}
+            />
+            <button
+              className={styles.testBtn}
+              onClick={handleTest}
+              disabled={testStatus === 'testing'}
+            >
+              {testStatus === 'testing' ? '…' : t('popup.testConnection')}
+            </button>
+          </div>
           {errors.baseUrl && <p className={styles.errorMsg}>{t('popup.baseUrlRequired')}</p>}
+          {testStatus === 'ok' && (
+            <p className={`${styles.testResult} ${styles.ok}`}>✓ {t('popup.testConnectionOk')}</p>
+          )}
+          {testStatus === 'error' && (
+            <p className={`${styles.testResult} ${styles.error}`}>
+              {testError || t('popup.testConnectionError')}
+            </p>
+          )}
         </div>
       )}
 

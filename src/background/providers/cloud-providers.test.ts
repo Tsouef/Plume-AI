@@ -108,3 +108,77 @@ describe('MistralProvider — API endpoint', () => {
     expect(vi.mocked(fetch).mock.calls[0][0] as string).toContain('api.mistral.ai')
   })
 })
+
+describe('ClaudeProvider — grammar system prompt', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  const okResponse = (text: string) =>
+    new Response(JSON.stringify({ content: [{ type: 'text', text }] }), { status: 200 })
+
+  it('sends system param at top level of request body', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse('[]'))
+    await new ClaudeProvider('key').checkGrammar('test text', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.system).toBeTypeOf('string')
+    expect((body.system as string).length).toBeGreaterThan(10)
+  })
+
+  it('user message contains only the text, not the grammar rules', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse('[]'))
+    await new ClaudeProvider('key').checkGrammar('my test input', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    const userContent: string = body.messages[0].content
+    expect(userContent).toContain('my test input')
+    expect(userContent).not.toContain('false cognates')
+  })
+})
+
+describe('OpenAIProvider — grammar JSON mode', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  const okResponse = (text: string) =>
+    new Response(JSON.stringify({ choices: [{ message: { content: text } }] }), { status: 200 })
+
+  it('sends system message as first message in array', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse('[]'))
+    await new OpenAIProvider('key').checkGrammar('test', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.messages[0].role).toBe('system')
+    expect(body.messages[0].content).toBeTypeOf('string')
+  })
+
+  it('enables json_object response format', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse('[]'))
+    await new OpenAIProvider('key').checkGrammar('test', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.response_format?.type).toBe('json_object')
+  })
+})
+
+describe('MistralProvider — grammar JSON mode', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  const okResponse = (text: string) =>
+    new Response(JSON.stringify({ choices: [{ message: { content: text } }] }), { status: 200 })
+
+  it('sends system message as first message in array', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse('[]'))
+    await new MistralProvider('key').checkGrammar('test', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.messages[0].role).toBe('system')
+    expect(body.messages[0].content).toBeTypeOf('string')
+  })
+
+  it('enables json_object response format', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse('[]'))
+    await new MistralProvider('key').checkGrammar('test', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.response_format?.type).toBe('json_object')
+  })
+})

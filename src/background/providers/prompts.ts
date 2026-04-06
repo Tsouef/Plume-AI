@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { GrammarError, TonePreset, UiLocale } from '../../shared/types'
 
 const EXPLANATION_LANG_NAMES: Record<UiLocale, string> = {
@@ -25,42 +26,29 @@ export function buildGrammarPrompt(
   text: string,
   language: string,
   uiLanguage: UiLocale = 'en'
-): string {
-  const langInstruction = buildGrammarLangInstruction(language)
+): { system: string; user: string } {
   const explanationLang = EXPLANATION_LANG_NAMES[uiLanguage]
-  return `You are a strict grammar and spelling checker. ${langInstruction}
 
-Your job is to find real grammar, spelling, and word-choice errors in the text's own language — not style suggestions, and NEVER suggest replacing a word with its equivalent in another language.
+  const system = `You are an expert, strict grammar and spelling checker. Your mission is to find EVERY SINGLE error in the text.
+Look for: spelling, conjugation, subject-verb agreement, gender/number agreement, articles, prepositions, word choice.
 
-Apply the rules of the detected language strictly. Look for:
-- Spelling mistakes
-- Wrong verb conjugation, tense, or mood
-- Subject-verb agreement errors
-- Gender or number agreement errors (where applicable: adjectives, articles, pronouns, participles)
-- Wrong or missing articles (where applicable)
-- Wrong prepositions
-- Countability or mass noun errors: nouns used in the wrong number or with the wrong quantifier for the language
-- Wrong word choice: a word exists in the language but is used with the wrong meaning — including false cognates caused by interference from another language (e.g. a word borrowed from another language but used with the meaning it has there, not in this language)
-- Missing or extra words that break grammatical structure
+BE EXHAUSTIVE. Scan word by word. Do not skip any mistake.
+Do NOT suggest style improvements or translations.
 
-Be strict and exhaustive: scan every word and phrase. Flag ALL errors, including basic spelling mistakes, non-standard words (e.g. "irregardless"), compound words written as one (e.g. "noone" → "no one"), and double comparatives (e.g. "more earlier"). Do not stop after finding a few — check the entire text word by word.
+Respond with a JSON object containing an "errors" array:
+{"errors": [{"original": "wrong phrase", "replacement": "corrected", "message": "explanation in ${explanationLang}", "context": "4-8 words around it"}]}
 
-Do NOT:
-- Suggest translating words into another language
-- Flag words that are correct in the text's own language
-- Make style or tone suggestions
-- Flag correct but formal or informal word choices
+Examples:
+Input: "I has a apple."
+Output: {"errors": [{"original":"has","replacement":"have","message":"Subject-verb agreement error","context":"I has a apple"},{"original":"a","replacement":"an","message":"Use 'an' before vowels","context":"has a apple"}]}
 
-Return a JSON array. Each error object must have:
-- "original": the exact erroneous word or phrase as it appears in the text
-- "replacement": the corrected version in the same language
-- "message": a short explanation of the rule, written in ${explanationLang}
-- "context": 4–8 words surrounding the error to uniquely locate it in the text
+Input: "Je voudrai tenté de faire des fotes."
+Output: {"errors": [{"original":"voudrai","replacement":"voudrais","message":"Conditionnel requis ici","context":"Je voudrai tenté de"},{"original":"tenté","replacement":"tenter","message":"Infinitif requis après le verbe","context":"voudrai tenté de faire"},{"original":"fotes","replacement":"fautes","message":"Orthographe incorrecte","context":"faire des fotes"}]}`
 
-Return ONLY the JSON array, no explanation, no markdown. If there are truly no errors, return [].
+  const langInstruction = buildGrammarLangInstruction(language)
+  const user = `${langInstruction}\n\nText:\n${text}`
 
-Text:
-${text}`
+  return { system, user }
 }
 
 export function buildRewritePrompt(
@@ -72,23 +60,39 @@ export function buildRewritePrompt(
   return `${buildRewriteLangInstruction(language)} Fix all grammar, spelling, and style issues. Make it sound natural and professional. Return only the rewritten text, nothing else.\n\nText:\n${target}`
 }
 
-export function parseGrammarErrors(raw: string): GrammarError[] {
-  const match = raw.match(/\[[\s\S]*\]/)
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(match ? match[0] : raw)
-  } catch {
-    throw new Error('Could not parse grammar response')
+const GrammarErrorSchema = z.object({
+  original: z.string(),
+  replacement: z.string(),
+  message: z.string(),
+  context: z.string().optional(),
+})
+
+const GrammarResponseSchema = z.array(GrammarErrorSchema)
+
+export function parseGrammarErrors(raw: unknown): GrammarError[] {
+  let parsed: unknown = raw
+
+  if (typeof raw === 'string') {
+    const match = raw.match(/\[[\s\S]*\]/) || raw.match(/\{[\s\S]*\}/)
+    try {
+      parsed = JSON.parse(match ? match[0] : raw)
+    } catch {
+      return []
+    }
   }
-  if (!Array.isArray(parsed)) throw new Error('Unexpected grammar response format')
-  return parsed.filter(
-    (e) =>
-      typeof e.original === 'string' &&
-      typeof e.replacement === 'string' &&
-      typeof e.message === 'string' &&
-      typeof e.context === 'string' &&
-      e.original !== e.replacement // skip no-op corrections (AI knows something is wrong but can't fix it)
-  )
+
+  // Handle OpenAI "json_object" mode that might wrap errors in a field
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+    const possibleArray = Object.values(parsed).find(Array.isArray)
+    if (possibleArray) parsed = possibleArray
+  }
+
+  const result = GrammarResponseSchema.safeParse(parsed)
+  if (!result.success) return []
+
+  return result.data
+    .filter((e) => e.original !== e.replacement)
+    .filter((e): e is typeof e & { context: string } => !!e.context)
 }
 
 export function buildTranslatePrompt(text: string, targetLanguage: string): string {

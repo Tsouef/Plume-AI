@@ -3,7 +3,16 @@
   "name": "Grammar Assistant",
   "version": "1.0.0",
   "description": "On-demand grammar checking and AI rewriting for any web text field",
-  "permissions": ["storage"],
+  "permissions": ["storage", "scripting"],
+  "commands": {
+    "open-panel": {
+      "suggested_key": {
+        "mac": "Command+Shift+G",
+        "default": "Ctrl+Shift+G"
+      },
+      "description": "Open grammar panel on focused field"
+    }
+  },
   "host_permissions": ["<all_urls>"],
   "browser_specific_settings": {
     "gecko": {

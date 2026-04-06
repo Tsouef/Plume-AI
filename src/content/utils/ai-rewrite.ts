@@ -1,5 +1,5 @@
 import type { AIRewriteMessage, AIRewriteResponse, TonePreset } from '../../shared/types'
-import { toErrorMessage } from '../../shared/constants'
+import { toErrorMessage, MAX_GRAMMAR_TEXT_LENGTH } from '../../shared/constants'
 import { sendBackgroundMessage } from './messaging'
 import i18n from '../../shared/i18n/i18n'
 
@@ -13,6 +13,10 @@ export function requestAIRewrite(
   const text = field.textContent ?? ''
   if (!text.trim()) {
     onError(i18n.t('error.nothingToRewrite'))
+    return
+  }
+  if (text.length > MAX_GRAMMAR_TEXT_LENGTH) {
+    onError(i18n.t('error.textTooLong', { max: MAX_GRAMMAR_TEXT_LENGTH }))
     return
   }
 
@@ -40,5 +44,8 @@ export function requestAIRewrite(
 
   sendBackgroundMessage<AIRewriteResponse>(message)
     .then((response) => onResult(response.rewritten, isSelection, savedRange))
-    .catch((err) => onError(toErrorMessage(err)))
+    .catch((err) => {
+      const msg = toErrorMessage(err)
+      onError(msg === 'RATE_LIMIT' ? i18n.t('error.rateLimited') : msg)
+    })
 }

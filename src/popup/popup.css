@@ -41,6 +41,16 @@ body {
   min-height: 100px;
 }
 
+/* ─── Button reset ───────────────────────────────────────────────────────── */
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* ─── Shared input styles ────────────────────────────────────────────────── */
 
 select,

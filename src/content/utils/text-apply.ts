@@ -1,3 +1,4 @@
+// TODO: replace execCommand with Selection/Range API when Safari supports it universally
 function applyText(field: HTMLElement, newText: string): void {
   field.focus()
   const range = document.createRange()

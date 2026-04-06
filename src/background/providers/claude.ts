@@ -10,7 +10,10 @@ export class ClaudeProvider extends BaseProvider {
     super()
   }
 
-  protected async call(prompt: string): Promise<string> {
+  private async post(
+    messages: Array<{ role: string; content: string }>,
+    system?: string
+  ): Promise<string> {
     const response = await fetchWithTimeout(
       BASE_URL,
       {
@@ -24,7 +27,8 @@ export class ClaudeProvider extends BaseProvider {
         body: JSON.stringify({
           model: this.model,
           max_tokens: 4096,
-          messages: [{ role: 'user', content: prompt }],
+          ...(system !== undefined && { system }),
+          messages,
         }),
       },
       FETCH_TIMEOUT_MS
@@ -43,5 +47,13 @@ export class ClaudeProvider extends BaseProvider {
     const textBlock = data.content.find((b) => b.type === 'text')
     if (!textBlock?.text) throw new Error('Unexpected Claude API response shape')
     return textBlock.text.trim()
+  }
+
+  protected override async callGrammar(system: string, user: string): Promise<unknown> {
+    return this.post([{ role: 'user', content: user }], system)
+  }
+
+  protected async call(prompt: string): Promise<string> {
+    return this.post([{ role: 'user', content: prompt }])
   }
 }

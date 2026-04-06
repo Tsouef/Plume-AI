@@ -18,6 +18,9 @@
     "autoDetect": "Detección automática",
     "disabledSites": "Sitios desactivados",
     "addBtn": "+ Añadir",
+    "testConnection": "Probar",
+    "testConnectionOk": "Conexión OK",
+    "testConnectionError": "Conexión fallida",
     "save": "Guardar ajustes",
     "saved": "Guardado",
     "showHide": "Mostrar/ocultar"
@@ -34,6 +37,7 @@
     "issueCount_other": "{{count}} errores",
     "improve": "✦ Mejorar",
     "fixAll": "Corregir todo",
+    "localMode": "Local — sin datos enviados",
     "useThisVersion": "Usar esta versión",
     "accept": "Aceptar",
     "dismiss": "Descartar",

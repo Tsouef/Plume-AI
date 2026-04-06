@@ -18,6 +18,9 @@
     "autoDetect": "Automatisch detecteren",
     "disabledSites": "Uitgeschakelde sites",
     "addBtn": "+ Toevoegen",
+    "testConnection": "Testen",
+    "testConnectionOk": "Verbinding OK",
+    "testConnectionError": "Verbinding mislukt",
     "save": "Instellingen opslaan",
     "saved": "Opgeslagen",
     "showHide": "Tonen/verbergen"
@@ -34,6 +37,7 @@
     "issueCount_other": "{{count}} fouten",
     "improve": "✦ Verbeteren",
     "fixAll": "Alles corrigeren",
+    "localMode": "Lokaal — geen data verzonden",
     "useThisVersion": "Deze versie gebruiken",
     "accept": "Accepteren",
     "dismiss": "Sluiten",

@@ -32,12 +32,21 @@ export async function fetchWithTimeout(
 export abstract class BaseProvider implements AIProvider {
   protected abstract call(prompt: string): Promise<string>
 
+  /**
+   * Override in subclasses to use native system-prompt support and JSON mode.
+   * Default: concatenates system + user and calls this.call().
+   */
+  protected async callGrammar(system: string, user: string): Promise<unknown> {
+    return this.call(`${system}\n\n${user}`)
+  }
+
   async checkGrammar(
     text: string,
     language: string,
     uiLanguage: UiLocale
   ): Promise<GrammarError[]> {
-    const raw = await this.call(buildGrammarPrompt(text, language, uiLanguage))
+    const { system, user } = buildGrammarPrompt(text, language, uiLanguage)
+    const raw = await this.callGrammar(system, user)
     return parseGrammarErrors(raw)
   }
 

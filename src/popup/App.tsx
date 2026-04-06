@@ -68,6 +68,10 @@ function AppForm({ config, saveConfig }: AppFormProps) {
   const [domains, setDomains] = useState([...config.disabledDomains])
   const [errors, setErrors] = useState<{ apiKey?: boolean; baseUrl?: boolean; model?: boolean }>({})
   const [savedVisible, setSavedVisible] = useState(false)
+
+  useEffect(() => {
+    i18n.changeLanguage(uiLanguage)
+  }, [uiLanguage])
   const [ollamaModels, setOllamaModels] = useState<string[]>([])
   const [ollamaModelsStatus, setOllamaModelsStatus] = useState<'idle' | 'loading' | 'error'>(
     config.activeProvider === 'ollama' ? 'loading' : 'idle'

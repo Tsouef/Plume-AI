@@ -59,11 +59,22 @@ export interface GetOllamaModelsResponse {
   models: string[]
 }
 
+export interface TestConnectionMessage {
+  type: 'TEST_CONNECTION'
+  providerId: ProviderId
+  apiKey?: string
+  model?: string
+  baseUrl?: string
+}
+
+export type TestConnectionResponse = { ok: true } | { ok: false; error: string }
+
 export type BackgroundMessage =
   | CheckGrammarMessage
   | AIRewriteMessage
   | TranslateMessage
   | GetOllamaModelsMessage
+  | TestConnectionMessage
 
 export interface CheckGrammarResponse {
   errors: GrammarError[]
@@ -86,4 +97,5 @@ export type BackgroundResponse =
   | AIRewriteResponse
   | TranslateResponse
   | GetOllamaModelsResponse
+  | TestConnectionResponse
   | ErrorResponse

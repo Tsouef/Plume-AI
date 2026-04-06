@@ -4,6 +4,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // before index.ts registers chrome.runtime.onMessage.addListener at module load time.
 vi.hoisted(() => {
   vi.stubGlobal('chrome', {
+    commands: {
+      onCommand: { addListener: vi.fn() },
+    },
     runtime: {
       id: 'test-ext',
       onMessage: { addListener: vi.fn() },
@@ -15,6 +18,7 @@ import { handleMessage } from './index'
 
 vi.mock('./provider-factory', () => ({
   getActiveProvider: vi.fn(),
+  createProvider: vi.fn(),
 }))
 vi.mock('../shared/storage', () => ({
   getConfig: vi.fn(),
@@ -23,7 +27,7 @@ vi.mock('./providers/ollama', () => ({
   fetchOllamaModels: vi.fn(),
 }))
 
-import { getActiveProvider } from './provider-factory'
+import { getActiveProvider, createProvider } from './provider-factory'
 import { getConfig } from '../shared/storage'
 import { fetchOllamaModels } from './providers/ollama'
 
@@ -55,6 +59,7 @@ beforeEach(() => {
   } as never)
   mockGetProvider.mockReset()
   mockFetchModels.mockReset()
+  vi.mocked(createProvider).mockReset()
 })
 
 describe('handleMessage — CHECK_GRAMMAR', () => {
@@ -143,5 +148,39 @@ describe('handleMessage — GET_OLLAMA_MODELS', () => {
     })
 
     expect(result).toEqual({ models: [] })
+  })
+})
+
+const mockCreateProvider = vi.mocked(createProvider)
+
+describe('handleMessage — TEST_CONNECTION', () => {
+  it('returns { ok: true } when provider.translate returns a non-empty string', async () => {
+    mockCreateProvider.mockReturnValue({
+      checkGrammar: vi.fn(),
+      rewrite: vi.fn(),
+      translate: vi.fn().mockResolvedValue('ok'),
+    })
+
+    const result = await handleMessage({
+      type: 'TEST_CONNECTION',
+      providerId: 'claude',
+      apiKey: 'test-key',
+    })
+    expect(result).toEqual({ ok: true })
+  })
+
+  it('returns { ok: false, error } when provider.translate throws', async () => {
+    mockCreateProvider.mockReturnValue({
+      checkGrammar: vi.fn(),
+      rewrite: vi.fn(),
+      translate: vi.fn().mockRejectedValue(new Error('Invalid API key')),
+    })
+
+    const result = await handleMessage({
+      type: 'TEST_CONNECTION',
+      providerId: 'claude',
+      apiKey: 'bad-key',
+    })
+    expect(result).toEqual({ ok: false, error: 'Invalid API key' })
   })
 })

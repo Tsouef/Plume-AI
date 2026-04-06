@@ -63,6 +63,18 @@ describe('requestAIRewrite', () => {
     mockSend.mockRejectedValue(new Error('RATE_LIMIT'))
     const onError = vi.fn()
     requestAIRewrite(makeField('Some text'), 'en', vi.fn(), onError)
-    await vi.waitFor(() => expect(onError).toHaveBeenCalledWith('RATE_LIMIT'))
+    await vi.waitFor(() =>
+      expect(onError).toHaveBeenCalledWith('Rate limit — please wait a moment')
+    )
+  })
+})
+
+describe('requestAIRewrite — length limit', () => {
+  it('calls onError and does not send if text exceeds MAX_GRAMMAR_TEXT_LENGTH', async () => {
+    const longText = 'a'.repeat(3001)
+    const onError = vi.fn()
+    requestAIRewrite(makeField(longText), 'en', vi.fn(), onError)
+    await vi.waitFor(() => expect(onError).toHaveBeenCalledWith(expect.stringContaining('3000')))
+    expect(mockSend).not.toHaveBeenCalled()
   })
 })

@@ -36,9 +36,12 @@ vi.mock('motion/react', async (importOriginal) => {
   }
 })
 
+import type { ProviderId } from '../../../shared/types'
+
 interface MakeProps {
   state: PanelState
   isOpen?: boolean
+  activeProvider?: ProviderId
   onRequestAI?: (tone?: TonePreset) => void
   onApplyAI?: (rewritten: string, isSelection: boolean) => void
   onRequestTranslate?: (targetLang: string) => void
@@ -52,6 +55,7 @@ function renderPanel({ state, isOpen = true, ...overrides }: MakeProps) {
     isOpen,
     state,
     field: null,
+    activeProvider: 'openai' as const,
     onRequestAI: vi.fn(),
     onApplyAI: vi.fn(),
     onRequestTranslate: vi.fn(),
@@ -309,6 +313,7 @@ describe('GrammarPanel — scroll repositioning', () => {
         isOpen={true}
         state={{ type: 'idle' }}
         field={field}
+        activeProvider="openai"
         onRequestAI={vi.fn()}
         onApplyAI={vi.fn()}
         onRequestTranslate={vi.fn()}
@@ -365,5 +370,20 @@ describe('GrammarPanel — tone preset pills', () => {
     const improveBtn = document.querySelector<HTMLButtonElement>('.btn-improve')!
     await userEvent.click(improveBtn)
     expect(props.onRequestAI).toHaveBeenCalledWith(undefined)
+  })
+})
+
+describe('GrammarPanel — privacy badge', () => {
+  it('shows local mode badge when activeProvider is ollama', () => {
+    renderPanel({
+      state: { type: 'idle' },
+      activeProvider: 'ollama',
+    })
+    expect(screen.getByText(/local.*no data/i)).toBeInTheDocument()
+  })
+
+  it('does not show local mode badge for cloud providers', () => {
+    renderPanel({ state: { type: 'idle' }, activeProvider: 'gemini' })
+    expect(screen.queryByText(/local.*no data/i)).not.toBeInTheDocument()
   })
 })

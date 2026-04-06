@@ -5,18 +5,34 @@ interface TextPreviewProps {
 }
 
 export function TextPreview({ segments }: TextPreviewProps) {
+  const errorSegs = segments.filter((s) => s.error)
   return (
     <div className="text-preview">
-      {segments.map((seg, i) =>
-        seg.error ? (
-          <span key={i} className="error-group">
-            <mark className="error-highlight">{seg.text}</mark>
-            <span className="error-annotation"> → {seg.error.replacement}</span>
-            <span className="error-reason">{seg.error.message}</span>
-          </span>
-        ) : (
-          seg.text
-        )
+      <div className="text-body">
+        {segments.map((seg, i) =>
+          seg.error ? (
+            <span key={i} className="error-group">
+              <mark className="error-highlight">{seg.text}</mark>
+              <span className="error-annotation"> → {seg.error.replacement}</span>
+            </span>
+          ) : (
+            seg.text
+          )
+        )}
+      </div>
+      {errorSegs.length > 0 && (
+        <ul className="error-list">
+          {errorSegs.map((seg, i) => (
+            <li key={i} className="error-item">
+              <span className="error-item-word">{seg.text}</span>
+              <span className="error-item-arrow">→</span>
+              <span className="error-item-fix">{seg.error!.replacement}</span>
+              {seg.error!.message && (
+                <span className="error-item-reason">{seg.error!.message}</span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )

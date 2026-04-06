@@ -19,7 +19,7 @@ import { AIResultView } from './AIResultView/AIResultView'
 import { TranslateBar } from './TranslateBar/TranslateBar'
 import { buildSegments } from '../../utils/segments'
 import type { PanelState } from '../../hooks/usePanelState'
-import type { TonePreset } from '../../../shared/types'
+import type { TonePreset, ProviderId } from '../../../shared/types'
 
 export interface GrammarPanelHandle {
   isEventInside: (e: MouseEvent) => boolean
@@ -31,6 +31,7 @@ interface GrammarPanelProps {
   state: PanelState
   field: HTMLElement | null
   theme?: string
+  activeProvider: ProviderId
   onRequestAI: (tone?: TonePreset) => void
   onApplyAI: (rewritten: string, isSelection: boolean) => void
   onRequestTranslate: (targetLang: string) => void
@@ -66,6 +67,7 @@ export const GrammarPanel = memo(
         state,
         field,
         theme,
+        activeProvider,
         onRequestAI,
         onApplyAI,
         onRequestTranslate,
@@ -170,6 +172,7 @@ export const GrammarPanel = memo(
                 <PanelHeader
                   state={state}
                   matchedErrorCount={matchedErrorCount}
+                  activeProvider={activeProvider}
                   onRequestAI={onRequestAI}
                   onOpenSettings={onOpenSettings}
                 />

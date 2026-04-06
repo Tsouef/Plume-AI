@@ -32,6 +32,26 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
     dismiss,
   } = usePanelOrchestration(config)
 
+  useEffect(() => {
+    function handleCommand(message: { type?: string }) {
+      if (message.type !== 'OPEN_PANEL') return
+      if (isPanelOpen || !activeField) return
+      openPanel(activeField)
+    }
+    try {
+      chrome.runtime.onMessage.addListener(handleCommand)
+    } catch {
+      // Extension context invalidated
+    }
+    return () => {
+      try {
+        chrome.runtime.onMessage.removeListener(handleCommand)
+      } catch {
+        // Extension context invalidated
+      }
+    }
+  }, [isPanelOpen, activeField, openPanel])
+
   if (config.disabledDomains.includes(window.location.hostname)) return null
 
   return (
@@ -48,6 +68,7 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
         state={state}
         field={panelField}
         theme={config.uiTheme ?? 'dark'}
+        activeProvider={config.activeProvider}
         onRequestAI={handleRequestAI}
         onApplyAI={handleApplyAI}
         onRequestTranslate={handleRequestTranslate}

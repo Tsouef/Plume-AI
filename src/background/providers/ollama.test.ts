@@ -67,6 +67,30 @@ describe('OllamaProvider.translate', () => {
   })
 })
 
+describe('OllamaProvider — grammar system prompt', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  const okResponse = () =>
+    new Response(JSON.stringify({ message: { content: '[]' } }), { status: 200 })
+
+  it('sends system message as first message in array', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse())
+    await new OllamaProvider('http://localhost:11434', 'llama3').checkGrammar('test', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.messages[0].role).toBe('system')
+    expect(body.messages[0].content).toBeTypeOf('string')
+  })
+
+  it('sets format to "json" for grammar checks', async () => {
+    vi.mocked(fetch).mockResolvedValue(okResponse())
+    await new OllamaProvider('http://localhost:11434', 'llama3').checkGrammar('test', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.format).toBe('json')
+  })
+})
+
 describe('fetchOllamaModels', () => {
   it('returns model names from /api/tags', async () => {
     vi.mocked(fetch).mockResolvedValue(

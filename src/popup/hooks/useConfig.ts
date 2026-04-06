@@ -16,8 +16,19 @@ export function useConfig() {
         .then(setConfig)
         .catch(() => console.warn('[grammar-assistant] Failed to reload config on storage change'))
     }
-    chrome.storage.onChanged.addListener(handleStorageChange)
-    return () => chrome.storage.onChanged.removeListener(handleStorageChange)
+    try {
+      chrome.storage.onChanged.addListener(handleStorageChange)
+    } catch {
+      // Extension context invalidated — keep the loaded config
+      return
+    }
+    return () => {
+      try {
+        chrome.storage.onChanged.removeListener(handleStorageChange)
+      } catch {
+        // Extension context invalidated — nothing to clean up
+      }
+    }
   }, [])
 
   async function saveConfig(newConfig: Config): Promise<void> {

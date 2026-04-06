@@ -86,6 +86,45 @@ describe('GeminiProvider.checkGrammar', () => {
     expect(calledUrl).toContain('gemini-2.5-pro')
   })
 
+  it('sends systemInstruction in the request body', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '[]' }] } }] }), {
+        status: 200,
+      })
+    )
+    const provider = new GeminiProvider('key')
+    await provider.checkGrammar('text', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.systemInstruction?.parts?.[0]?.text).toBeTypeOf('string')
+    expect((body.systemInstruction.parts[0].text as string).length).toBeGreaterThan(10)
+  })
+
+  it('enables JSON output mode in generationConfig', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '[]' }] } }] }), {
+        status: 200,
+      })
+    )
+    const provider = new GeminiProvider('key')
+    await provider.checkGrammar('text', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    expect(body.generationConfig?.responseMimeType).toBe('application/json')
+  })
+
+  it('user message contains only the text and language instruction, not the rules', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '[]' }] } }] }), {
+        status: 200,
+      })
+    )
+    const provider = new GeminiProvider('key')
+    await provider.checkGrammar('my test input', 'auto', 'en')
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
+    const userText: string = body.contents[0].parts[0].text
+    expect(userText).toContain('my test input')
+    expect(userText).not.toContain('false cognates')
+  })
+
   it('aborts fetch after timeout and throws', async () => {
     vi.useFakeTimers()
     vi.stubGlobal(

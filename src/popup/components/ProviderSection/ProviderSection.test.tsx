@@ -102,3 +102,26 @@ describe('ProviderSection — model dropdown', () => {
     expect(screen.getByText(/unreachable/i)).toBeInTheDocument()
   })
 })
+
+describe('ProviderSection — test connection button', () => {
+  it('shows Test button for Ollama (no API key required)', () => {
+    renderSection({ activeProvider: 'ollama' })
+    expect(screen.getByRole('button', { name: /test/i })).toBeInTheDocument()
+  })
+
+  it('shows Test button for cloud provider when API key is entered', () => {
+    renderSection({
+      activeProvider: 'gemini',
+      providerStates: {
+        ...defaultProviderStates,
+        gemini: { apiKey: 'my-key', model: '', baseUrl: '' },
+      },
+    })
+    expect(screen.getByRole('button', { name: /test/i })).toBeInTheDocument()
+  })
+
+  it('hides Test button for cloud provider when API key is empty', () => {
+    renderSection({ activeProvider: 'gemini' })
+    expect(screen.queryByRole('button', { name: /test/i })).not.toBeInTheDocument()
+  })
+})
