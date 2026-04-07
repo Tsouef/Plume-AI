@@ -51,7 +51,8 @@
     "go": "Ga",
     "configureProvider": "Configureer een aanbieder in de instellingen",
     "openSettings": "Instellingen openen",
-    "openPanel": "Grammatica-assistent openen"
+    "openPanel": "Grammatica-assistent openen",
+    "toneOptions": "Toon herschrijven"
   },
   "tone": {
     "shorter": "Korter",

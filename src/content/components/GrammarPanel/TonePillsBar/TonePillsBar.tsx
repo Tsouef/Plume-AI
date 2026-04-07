@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import * as ToggleGroup from '@radix-ui/react-toggle-group'
 import { useTranslation } from 'react-i18next'
 import type { TonePreset } from '../../../../shared/types'
 
@@ -10,26 +10,21 @@ const TONES: TonePreset[] = ['shorter', 'formal', 'direct', 'technical']
 
 export function TonePillsBar({ onSelectTone }: TonePillsBarProps) {
   const { t } = useTranslation()
-  const [activeTone, setActiveTone] = useState<TonePreset | null>(null)
-
-  function handleSelect(tone: TonePreset) {
-    setActiveTone(tone)
-    onSelectTone(tone)
-  }
 
   return (
-    <div className="tone-bar">
+    <ToggleGroup.Root
+      type="single"
+      className="tone-bar"
+      aria-label={t('panel.toneOptions')}
+      onValueChange={(value) => {
+        if (value) onSelectTone(value as TonePreset)
+      }}
+    >
       {TONES.map((tone) => (
-        <button
-          key={tone}
-          className="btn-tone"
-          data-tone={tone}
-          aria-pressed={activeTone === tone}
-          onClick={() => handleSelect(tone)}
-        >
+        <ToggleGroup.Item key={tone} value={tone} className="btn-tone" data-tone={tone}>
           {t(`tone.${tone}`)}
-        </button>
+        </ToggleGroup.Item>
       ))}
-    </div>
+    </ToggleGroup.Root>
   )
 }

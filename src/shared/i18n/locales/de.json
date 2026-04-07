@@ -51,7 +51,8 @@
     "go": "Los",
     "configureProvider": "Einen Anbieter in den Einstellungen konfigurieren",
     "openSettings": "Einstellungen öffnen",
-    "openPanel": "Grammatik-Assistent öffnen"
+    "openPanel": "Grammatik-Assistent öffnen",
+    "toneOptions": "Ton anpassen"
   },
   "tone": {
     "shorter": "Kürzer",

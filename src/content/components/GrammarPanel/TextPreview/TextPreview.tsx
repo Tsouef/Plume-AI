@@ -1,3 +1,4 @@
+import { VisuallyHidden } from '../../../../shared/components/VisuallyHidden'
 import { Segment } from '../../../utils/segments'
 
 interface TextPreviewProps {
@@ -13,7 +14,11 @@ export function TextPreview({ segments }: TextPreviewProps) {
           seg.error ? (
             <span key={i} className="error-group">
               <mark className="error-highlight">{seg.text}</mark>
-              <span className="error-annotation"> → {seg.error.replacement}</span>
+              <span className="error-annotation" aria-hidden="true">
+                {' '}
+                → {seg.error.replacement}
+              </span>
+              <VisuallyHidden> replace with {seg.error.replacement}</VisuallyHidden>
             </span>
           ) : (
             seg.text
@@ -26,7 +31,9 @@ export function TextPreview({ segments }: TextPreviewProps) {
             <li key={i} className="error-item">
               <div className="error-item-header">
                 <span className="error-item-word">{seg.text}</span>
-                <span className="error-item-arrow">→</span>
+                <span className="error-item-arrow" aria-hidden="true">
+                  →
+                </span>
                 <span className="error-item-fix">{seg.error!.replacement}</span>
               </div>
               {seg.error!.message && <p className="error-item-reason">{seg.error!.message}</p>}

@@ -11,5 +11,8 @@
     "currentSite": "Current site",
     "enableSite": "Enable here",
     "disableSite": "Disable"
+  },
+  "panel": {
+    "toneOptions": "Rewrite tone"
   }
 }

@@ -22,13 +22,13 @@ export function PanelHeader({
 }: PanelHeaderProps) {
   const { t } = useTranslation()
 
-  function renderStatus() {
+  function renderStatusContent() {
     if (state.type === 'checking') {
       return (
-        <span className="status">
+        <>
           <Spinner />
           {t('panel.checking')}
-        </span>
+        </>
       )
     }
 
@@ -46,7 +46,7 @@ export function PanelHeader({
                 ? t('error.rateLimited')
                 : state.message
       return (
-        <span className="status">
+        <>
           <span className="status-icon error">⚠</span>
           {msg}
           {isNoProvider && onOpenSettings && (
@@ -54,64 +54,64 @@ export function PanelHeader({
               {t('panel.openSettings')}
             </button>
           )}
-        </span>
+        </>
       )
     }
 
     if (state.type === 'translating') {
       return (
-        <span className="status">
+        <>
           <Spinner />
           {t('panel.translating')}
-        </span>
+        </>
       )
     }
 
     if (state.type === 'ai-rewriting') {
       return (
-        <span className="status">
+        <>
           <Spinner />
           {t('panel.rewriting')}
-        </span>
+        </>
       )
     }
 
     if (state.type === 'translate-result') {
       return (
-        <span className="status">
+        <>
           <span className="status-icon info">✦</span>
           {t('panel.translation')}
-        </span>
+        </>
       )
     }
 
     if (state.type === 'ai-result') {
       return (
-        <span className="status">
+        <>
           <span className="status-icon info">✦</span>
           {t('panel.aiSuggestion')}
-        </span>
+        </>
       )
     }
 
     if (state.type === 'results') {
       if (isRechecking) {
         return (
-          <span className="status">
+          <>
             <Spinner />
             {t('panel.checking')}
-          </span>
+          </>
         )
       }
       const count = matchedErrorCount ?? state.errors.length
       if (count === 0) {
-        return <span className="status">✅ {t('panel.looksGood')}</span>
+        return <>✅ {t('panel.looksGood')}</>
       }
       return (
-        <span className="status">
+        <>
           <span className="status-icon warning">●</span>
           {` ${t('panel.issueCount', { count })}`}
-        </span>
+        </>
       )
     }
 
@@ -122,7 +122,9 @@ export function PanelHeader({
 
   return (
     <div className="header">
-      {renderStatus()}
+      <span id="grammar-panel-status" className="status" aria-live="polite" aria-atomic="true">
+        {renderStatusContent()}
+      </span>
       {showPolishButton && (
         <button className="btn-polish" onClick={() => onRequestAI(undefined)}>
           {t('panel.polish')}

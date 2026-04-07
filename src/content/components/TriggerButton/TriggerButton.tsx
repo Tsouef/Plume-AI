@@ -24,7 +24,6 @@ const BUTTON_STYLE: CSSProperties = {
   margin: 0,
   boxSizing: 'border-box',
   lineHeight: 1,
-  outline: 'none',
 }
 
 interface TriggerButtonProps {
@@ -59,19 +58,31 @@ export function TriggerButton({ field, onClick }: TriggerButtonProps) {
   }, [field])
 
   return createPortal(
-    <motion.button
-      aria-label={t('panel.openPanel')}
-      style={{ ...BUTTON_STYLE, top: position.top, left: position.left }}
-      onClick={onClick}
-      onMouseDown={(e) => e.preventDefault()}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.6 }}
-      whileHover={{ scale: 1.18 }}
-      transition={{ duration: 0.25, ease: EASE_OUT }}
-    >
-      ✦
-    </motion.button>,
+    <>
+      <style>{`
+        .translate-ai-trigger:focus-visible {
+          outline: 2px solid #00d4aa;
+          outline-offset: 2px;
+        }
+        .translate-ai-trigger:focus:not(:focus-visible) {
+          outline: none;
+        }
+      `}</style>
+      <motion.button
+        className="translate-ai-trigger"
+        aria-label={t('panel.openPanel')}
+        style={{ ...BUTTON_STYLE, top: position.top, left: position.left }}
+        onClick={onClick}
+        onMouseDown={(e) => e.preventDefault()}
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.6 }}
+        whileHover={{ scale: 1.18 }}
+        transition={{ duration: 0.25, ease: EASE_OUT }}
+      >
+        ✦
+      </motion.button>
+    </>,
     document.body
   )
 }

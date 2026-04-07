@@ -31,3 +31,9 @@
   color: var(--accent);
   background: var(--accent-glow);
 }
+
+.btn-tone[data-state='on'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}

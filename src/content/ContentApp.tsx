@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { AnimatePresence } from 'motion/react'
+import { AnimatePresence, MotionConfig } from 'motion/react'
 import { usePanelOrchestration } from './hooks/usePanelOrchestration'
 import { TriggerButton } from './components/TriggerButton/TriggerButton'
 import { GrammarPanel } from './components/GrammarPanel/GrammarPanel'
@@ -56,7 +56,7 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
   if (config.disabledDomains.includes(window.location.hostname)) return null
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <AnimatePresence>
         {activeField && (
           <TriggerButton key="trigger" field={activeField} onClick={() => openPanel(activeField)} />
@@ -78,6 +78,6 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
         onDismiss={dismiss}
         onOpenSettings={() => chrome.runtime.openOptionsPage()}
       />
-    </>
+    </MotionConfig>
   )
 }

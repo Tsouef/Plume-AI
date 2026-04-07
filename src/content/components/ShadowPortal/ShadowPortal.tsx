@@ -12,6 +12,7 @@ import { panelStyles } from '../GrammarPanel/panel-styles'
 
 export interface ShadowPortalHandle {
   host: HTMLElement | null
+  mountPoint: HTMLElement | null
 }
 
 interface ShadowPortalProps {
@@ -25,11 +26,15 @@ interface ShadowPortalProps {
 export const ShadowPortal = forwardRef<ShadowPortalHandle, ShadowPortalProps>(
   ({ children, style, id, theme, onHostMount }, ref) => {
     const hostRef = useRef<HTMLDivElement>(null)
+    const mountPointRef = useRef<HTMLElement | null>(null)
     const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null)
 
     useImperativeHandle(ref, () => ({
       get host() {
         return hostRef.current
+      },
+      get mountPoint() {
+        return mountPointRef.current
       },
     }))
 
@@ -45,6 +50,7 @@ export const ShadowPortal = forwardRef<ShadowPortalHandle, ShadowPortalProps>(
 
       const mount = document.createElement('div')
       shadow.appendChild(mount)
+      mountPointRef.current = mount
       setMountPoint(mount)
       onHostMount?.(host)
     }, [onHostMount])

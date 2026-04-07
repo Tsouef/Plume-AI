@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2022", "DOM"],
     "types": ["chrome", "vite/client", "react", "react-dom"],
     "noEmit": true,
     "skipLibCheck": true,

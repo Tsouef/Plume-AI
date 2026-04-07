@@ -31,12 +31,12 @@
   letter-spacing: 0.01em;
 }
 
-.btn:hover:not(.active) {
+.btn:hover:not([data-state='on']) {
   color: var(--text-secondary);
   background: var(--btn-ghost-bg);
 }
 
-.btn.active {
+.btn[data-state='on'] {
   background: var(--bg-secondary);
   color: var(--text-primary);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);

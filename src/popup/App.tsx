@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'motion/react'
+import { motion, MotionConfig } from 'motion/react'
+import * as Toast from '@radix-ui/react-toast'
 import { useTranslation } from 'react-i18next'
 import { useConfig } from './hooks/useConfig'
 import type { Config, ProviderId, UiLocale, UiTheme } from '../shared/types'
@@ -140,15 +141,37 @@ function AppForm({ config, saveConfig }: AppFormProps) {
     if (!granted) return
     const newDomains = [...trustedDomains, domain]
     setTrustedDomains(newDomains)
-    saveConfig({ ...config, trustedDomains: newDomains })
+    // Await so the config is flushed before the content script reads it
+    await saveConfig({ ...config, trustedDomains: newDomains })
+    // Inject immediately so the user doesn't have to reload the page
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      if (tab?.id)
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['src/content/index.js'],
+        })
+    } catch {
+      // Already injected or tab not injectable
+    }
   }
 
   async function handleRevokeDomain(domain: string) {
-    const removed = await chrome.permissions.remove({ origins: [`*://${domain}/*`] })
-    if (!removed) return
+    try {
+      await chrome.permissions.remove({ origins: [`*://${domain}/*`] })
+    } catch {
+      // Permission didn't exist — proceed anyway
+    }
     const newDomains = trustedDomains.filter((d) => d !== domain)
     setTrustedDomains(newDomains)
     saveConfig({ ...config, trustedDomains: newDomains })
+    // Deactivate the content script on the current tab immediately
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      if (tab?.id) await chrome.tabs.sendMessage(tab.id, { type: 'DEACTIVATE' })
+    } catch {
+      // Content script not present on current tab
+    }
   }
 
   async function handleSave() {
@@ -190,54 +213,66 @@ function AppForm({ config, saveConfig }: AppFormProps) {
   }
 
   return (
-    <>
-      <h1 className={styles.heading}>
-        <span className={styles.logoIcon}>✦</span>
-        {t('popup.heading')}
-      </h1>
-      <motion.div variants={containerVariants} initial="hidden" animate="visible">
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <ProviderSection
-            activeProvider={activeProvider}
-            providerStates={providerStates}
-            onProviderChange={handleProviderChange}
-            onStateChange={handleStateChange}
-            errors={errors}
-            ollamaModels={ollamaModels}
-            ollamaModelsStatus={ollamaModelsStatus}
-          />
+    <MotionConfig reducedMotion="user">
+      <Toast.Provider swipeDirection="right">
+        <h1 className={styles.heading}>
+          <span className={styles.logoIcon}>✦</span>
+          {t('popup.heading')}
+        </h1>
+        <motion.div variants={containerVariants} initial="hidden" animate="visible">
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <ProviderSection
+              activeProvider={activeProvider}
+              providerStates={providerStates}
+              onProviderChange={handleProviderChange}
+              onStateChange={handleStateChange}
+              errors={errors}
+              ollamaModels={ollamaModels}
+              ollamaModelsStatus={ollamaModelsStatus}
+            />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <LanguageSection value={language} onChange={setLanguage} />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <UiLanguageSection value={uiLanguage} onChange={handleUiLanguageChange} />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <ManualModeSection value={manualOnly} onChange={setManualOnly} />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <ThemeSection value={uiTheme} onChange={handleUiThemeChange} />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <DisabledSitesSection
+              domains={domains}
+              onAdd={handleAddDomain}
+              onRemove={handleRemoveDomain}
+            />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <SitePermissionSection
+              trustedDomains={trustedDomains}
+              onGrant={handleGrantDomain}
+              onRevoke={handleRevokeDomain}
+            />
+          </motion.div>
+          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+            <SaveButton onClick={handleSave} />
+            <SavedMessage visible={savedVisible} />
+          </motion.div>
         </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <LanguageSection value={language} onChange={setLanguage} />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <UiLanguageSection value={uiLanguage} onChange={handleUiLanguageChange} />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <ManualModeSection value={manualOnly} onChange={setManualOnly} />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <ThemeSection value={uiTheme} onChange={handleUiThemeChange} />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <DisabledSitesSection
-            domains={domains}
-            onAdd={handleAddDomain}
-            onRemove={handleRemoveDomain}
-          />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <SitePermissionSection
-            trustedDomains={trustedDomains}
-            onGrant={handleGrantDomain}
-            onRevoke={handleRevokeDomain}
-          />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <SaveButton onClick={handleSave} />
-          <SavedMessage visible={savedVisible} />
-        </motion.div>
-      </motion.div>
-    </>
+        <Toast.Viewport
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            right: 0,
+            padding: 0,
+            listStyle: 'none',
+            outline: 'none',
+          }}
+        />
+      </Toast.Provider>
+    </MotionConfig>
   )
 }

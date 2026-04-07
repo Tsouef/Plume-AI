@@ -51,7 +51,8 @@
     "go": "Ir",
     "configureProvider": "Configurar un proveedor en los ajustes",
     "openSettings": "Abrir ajustes",
-    "openPanel": "Abrir asistente gramatical"
+    "openPanel": "Abrir asistente gramatical",
+    "toneOptions": "Reescribir tono"
   },
   "tone": {
     "shorter": "Más corto",

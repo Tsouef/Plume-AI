@@ -3,6 +3,7 @@ import { forwardRef, useImperativeHandle, useEffect, useRef } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { axe } from 'vitest-axe'
 import { GrammarPanel } from './GrammarPanel'
 import type { TonePreset } from '../../../shared/types'
 import type { PanelState } from '../../hooks/usePanelState'
@@ -17,10 +18,13 @@ vi.mock('../ShadowPortal/ShadowPortal', () => ({
       children,
       onHostMount,
     }: { children: React.ReactNode; onHostMount?: (host: HTMLElement) => void },
-    ref: React.Ref<{ host: HTMLElement | undefined }>
+    ref: React.Ref<{ host: HTMLElement | undefined; mountPoint: HTMLElement | undefined }>
   ) {
     const divRef = useRef<HTMLDivElement>(null)
-    useImperativeHandle(ref, () => ({ host: divRef.current ?? undefined }))
+    useImperativeHandle(ref, () => ({
+      host: divRef.current ?? undefined,
+      mountPoint: divRef.current ?? undefined,
+    }))
     useEffect(() => {
       if (divRef.current) onHostMount?.(divRef.current)
     }, [onHostMount])
@@ -443,6 +447,30 @@ describe('GrammarPanel — tone preset pills', () => {
   })
 })
 
+describe('GrammarPanel — mouse interaction', () => {
+  it('clicking a button inside the panel does not call preventDefault', () => {
+    renderPanel({ state: { type: 'results', errors: [], fieldText: '' } })
+    const polishButton = screen.getByRole('button', { name: /polish/i })
+    const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    polishButton.dispatchEvent(mousedown)
+    expect(mousedown.defaultPrevented).toBe(false)
+  })
+})
+
+describe('GrammarPanel — focus styles', () => {
+  it('Fix All button is reachable by role', () => {
+    renderPanel({
+      state: {
+        type: 'results',
+        errors: [makeError('feedbacks', 'feedback')],
+        fieldText: 'context with feedbacks',
+      },
+    })
+    const fixAll = screen.getByRole('button', { name: /fix all/i })
+    expect(fixAll).toBeTruthy()
+  })
+})
+
 describe('GrammarPanel — privacy badge', () => {
   it('shows local mode badge when activeProvider is ollama', () => {
     renderPanel({
@@ -455,5 +483,89 @@ describe('GrammarPanel — privacy badge', () => {
   it('does not show local mode badge for cloud providers', () => {
     renderPanel({ state: { type: 'idle' }, activeProvider: 'gemini' })
     expect(screen.queryByText(/local.*no data/i)).not.toBeInTheDocument()
+  })
+})
+
+describe('GrammarPanel — keyboard', () => {
+  it('calls onClose when Escape key is pressed inside the panel', async () => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    renderPanel({
+      state: { type: 'results', errors: [], fieldText: '' },
+      onClose,
+    })
+    const dialog = screen.getByRole('dialog')
+    dialog.focus()
+    await user.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('GrammarPanel — screen reader', () => {
+  it('has an aria-live="polite" region for status announcements', () => {
+    renderPanel({ state: { type: 'checking' } })
+    const liveRegion = document.querySelector('[aria-live="polite"]')
+    expect(liveRegion).not.toBeNull()
+  })
+
+  it('status region announces the checking state', () => {
+    renderPanel({ state: { type: 'checking' } })
+    expect(document.querySelector('[aria-live="polite"]')?.textContent).toMatch(/checking/i)
+  })
+})
+
+describe('GrammarPanel — screen reader labels', () => {
+  it('error annotation arrow has sr-only "replace with" text', () => {
+    renderPanel({
+      state: {
+        type: 'results',
+        errors: [makeError('feedbacks', 'feedback')],
+        fieldText: 'context with feedbacks',
+      },
+    })
+    // The visually hidden "replace with" text should be in the DOM
+    expect(document.body.textContent).toMatch(/replace with/i)
+  })
+})
+
+describe('GrammarPanel — axe accessibility', () => {
+  it('has no axe violations in results state with errors', async () => {
+    renderPanel({
+      state: {
+        type: 'results',
+        errors: [makeError('feedbacks', 'feedback')],
+        fieldText: 'context with feedbacks',
+      },
+    })
+    const results = await axe(document.body)
+    expect(results).toHaveNoViolations()
+  })
+
+  it('has no axe violations in results state with no errors', async () => {
+    renderPanel({ state: { type: 'results', errors: [], fieldText: '' } })
+    const results = await axe(document.body)
+    expect(results).toHaveNoViolations()
+  })
+
+  it('has no axe violations in error state', async () => {
+    renderPanel({ state: { type: 'error', message: 'Something went wrong' } })
+    const results = await axe(document.body)
+    expect(results).toHaveNoViolations()
+  })
+
+  it('has no axe violations in ai-result state', async () => {
+    renderPanel({
+      state: { type: 'ai-result', rewritten: 'Polished text here', isSelection: false },
+    })
+    const results = await axe(document.body)
+    expect(results).toHaveNoViolations()
+  })
+
+  it('has no axe violations in translate-result state', async () => {
+    renderPanel({
+      state: { type: 'translate-result', translated: 'Texte traduit ici' },
+    })
+    const results = await axe(document.body)
+    expect(results).toHaveNoViolations()
   })
 })

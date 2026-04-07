@@ -15,7 +15,7 @@ body {
   --border-accent: rgba(0, 212, 170, 0.3);
   --text-primary: #e8e9ed;
   --text-secondary: #8b8d98;
-  --text-muted: #5c5e6a;
+  --text-muted: #7c7e8a;
   --accent: #00d4aa;
   --accent-hover: #00eabc;
   --accent-glow: rgba(0, 212, 170, 0.18);
@@ -111,7 +111,7 @@ body[data-theme='light'] {
   --border-accent: rgba(0, 168, 142, 0.3);
   --text-primary: #0d0e14;
   --text-secondary: #4e5063;
-  --text-muted: #878a9a;
+  --text-muted: #686b7a;
   --accent: #00a88e;
   --accent-hover: #00bf9f;
   --accent-glow: rgba(0, 168, 142, 0.12);
@@ -146,4 +146,11 @@ body[data-theme='light'] ::-webkit-scrollbar-thumb {
 }
 body[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 168, 142, 0.4);
+}
+
+/* ─── Focus-visible for buttons (WCAG 2.1 AA) ───────────────────────────── */
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

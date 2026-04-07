@@ -1,5 +1,6 @@
 interface AIResultViewProps {
   text: string
+  label: string
   primaryLabel: string
   secondaryLabel: string
   onPrimary: () => void
@@ -8,6 +9,7 @@ interface AIResultViewProps {
 
 export function AIResultView({
   text,
+  label,
   primaryLabel,
   secondaryLabel,
   onPrimary,
@@ -15,7 +17,15 @@ export function AIResultView({
 }: AIResultViewProps) {
   return (
     <>
-      <div className="ai-result">{text}</div>
+      <div
+        className="ai-result"
+        aria-live="polite"
+        aria-atomic="true"
+        role="region"
+        aria-label={label}
+      >
+        {text}
+      </div>
       <div className="actions">
         <button className="btn-primary" onClick={onPrimary}>
           {primaryLabel}
