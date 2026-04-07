@@ -16,7 +16,7 @@ chrome.commands.onCommand.addListener(async (command) => {
     try {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        files: ['src/content/index.tsx'],
+        files: ['src/content/index.js'],
       })
       await chrome.tabs.sendMessage(tab.id, { type: 'OPEN_PANEL' })
     } catch {
@@ -40,7 +40,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (!config.trustedDomains.includes(hostname)) return
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ['src/content/index.tsx'],
+      files: ['src/content/index.js'],
     })
   } catch {
     // Storage unavailable, already injected, or tab not injectable

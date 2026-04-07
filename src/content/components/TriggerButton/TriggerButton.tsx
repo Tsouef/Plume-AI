@@ -60,16 +60,16 @@ export function TriggerButton({ field, onClick }: TriggerButtonProps) {
   return createPortal(
     <>
       <style>{`
-        .translate-ai-trigger:focus-visible {
+        .plume-ai-trigger:focus-visible {
           outline: 2px solid #00d4aa;
           outline-offset: 2px;
         }
-        .translate-ai-trigger:focus:not(:focus-visible) {
+        .plume-ai-trigger:focus:not(:focus-visible) {
           outline: none;
         }
       `}</style>
       <motion.button
-        className="translate-ai-trigger"
+        className="plume-ai-trigger"
         aria-label={t('panel.openPanel')}
         style={{ ...BUTTON_STYLE, top: position.top, left: position.left }}
         onClick={onClick}

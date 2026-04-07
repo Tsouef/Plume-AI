@@ -53,7 +53,7 @@ export function usePanelOrchestration(config: Config) {
       setPanelField(field)
       setIsPanelOpen(true)
       panelState.setChecking()
-      grammarCheck(field.textContent ?? '')
+      grammarCheck(field.textContent ?? '', true)
 
       // Wire input listener for live re-checking (skipped in manual-only mode)
       if (inputListenerRef.current) {

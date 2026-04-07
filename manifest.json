@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Grammar Assistant",
+  "name": "Plume AI",
   "version": "1.0.0",
   "description": "On-demand grammar checking and AI rewriting for any web text field",
   "permissions": ["storage", "scripting", "activeTab", "tabs"],
@@ -16,7 +16,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "grammar-assistant@tsouef.dev",
+      "id": "plume-ai@tsouef.dev",
       "strict_min_version": "109.0"
     }
   },

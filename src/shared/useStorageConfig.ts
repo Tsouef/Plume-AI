@@ -9,7 +9,7 @@ export function useStorageConfig(initialConfig: Config): Config {
     function handleStorageChange() {
       getConfig()
         .then(setConfig)
-        .catch(() => console.warn('[grammar-assistant] Failed to reload config on storage change'))
+        .catch(() => console.warn('[plume-ai] Failed to reload config on storage change'))
     }
     try {
       chrome.storage.onChanged.addListener(handleStorageChange)

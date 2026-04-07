@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { motion, MotionConfig } from 'motion/react'
-import * as Toast from '@radix-ui/react-toast'
 import { useTranslation } from 'react-i18next'
 import { useConfig } from './hooks/useConfig'
 import type { Config, ProviderId, UiLocale, UiTheme } from '../shared/types'
@@ -214,65 +213,53 @@ function AppForm({ config, saveConfig }: AppFormProps) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <Toast.Provider swipeDirection="right">
-        <h1 className={styles.heading}>
-          <span className={styles.logoIcon}>✦</span>
-          {t('popup.heading')}
-        </h1>
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <ProviderSection
-              activeProvider={activeProvider}
-              providerStates={providerStates}
-              onProviderChange={handleProviderChange}
-              onStateChange={handleStateChange}
-              errors={errors}
-              ollamaModels={ollamaModels}
-              ollamaModelsStatus={ollamaModelsStatus}
-            />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <LanguageSection value={language} onChange={setLanguage} />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <UiLanguageSection value={uiLanguage} onChange={handleUiLanguageChange} />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <ManualModeSection value={manualOnly} onChange={setManualOnly} />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <ThemeSection value={uiTheme} onChange={handleUiThemeChange} />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <DisabledSitesSection
-              domains={domains}
-              onAdd={handleAddDomain}
-              onRemove={handleRemoveDomain}
-            />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <SitePermissionSection
-              trustedDomains={trustedDomains}
-              onGrant={handleGrantDomain}
-              onRevoke={handleRevokeDomain}
-            />
-          </motion.div>
-          <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-            <SaveButton onClick={handleSave} />
-            <SavedMessage visible={savedVisible} />
-          </motion.div>
+      <h1 className={styles.heading}>
+        <span className={styles.logoIcon}>✦</span>
+        {t('popup.heading')}
+      </h1>
+      <motion.div variants={containerVariants} initial="hidden" animate="visible">
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <ProviderSection
+            activeProvider={activeProvider}
+            providerStates={providerStates}
+            onProviderChange={handleProviderChange}
+            onStateChange={handleStateChange}
+            errors={errors}
+            ollamaModels={ollamaModels}
+            ollamaModelsStatus={ollamaModelsStatus}
+          />
         </motion.div>
-        <Toast.Viewport
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            right: 0,
-            padding: 0,
-            listStyle: 'none',
-            outline: 'none',
-          }}
-        />
-      </Toast.Provider>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <LanguageSection value={language} onChange={setLanguage} />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <UiLanguageSection value={uiLanguage} onChange={handleUiLanguageChange} />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <ManualModeSection value={manualOnly} onChange={setManualOnly} />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <ThemeSection value={uiTheme} onChange={handleUiThemeChange} />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <DisabledSitesSection
+            domains={domains}
+            onAdd={handleAddDomain}
+            onRemove={handleRemoveDomain}
+          />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <SitePermissionSection
+            trustedDomains={trustedDomains}
+            onGrant={handleGrantDomain}
+            onRevoke={handleRevokeDomain}
+          />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <SaveButton onClick={handleSave} />
+          <SavedMessage visible={savedVisible} />
+        </motion.div>
+      </motion.div>
     </MotionConfig>
   )
 }

@@ -46,7 +46,7 @@ export function useGrammarCheck({
   }, [language, uiLanguage, delay, onResultsRef, onErrorRef, onStartRef, onSkipRef])
 
   // Return a stable callback that delegates to the latest checker instance.
-  return useCallback((text: string) => {
-    checkerRef.current?.check(text)
+  return useCallback((text: string, force = false) => {
+    checkerRef.current?.check(text, force)
   }, [])
 }

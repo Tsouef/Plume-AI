@@ -20,7 +20,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('[GrammarAssistant] Unhandled error:', error, info.componentStack)
+    console.error('[PlumeAI] Unhandled error:', error, info.componentStack)
   }
 
   render() {

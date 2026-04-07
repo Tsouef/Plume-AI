@@ -12,11 +12,11 @@ export function TranslateBar({ onRequestTranslate }: TranslateBarProps) {
 
   return (
     <div className="translate-bar">
-      <label className="translate-label" htmlFor="grammar-assistant-translate-lang">
+      <label className="translate-label" htmlFor="plume-ai-translate-lang">
         {t('panel.translateTo')}
       </label>
       <select
-        id="grammar-assistant-translate-lang"
+        id="plume-ai-translate-lang"
         className="translate-select"
         value={targetLang}
         onChange={(e) => setTargetLang(e.target.value)}

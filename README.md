@@ -1,4 +1,4 @@
-# Grammar Assistant
+# Plume AI
 
 A browser extension (Chrome + Firefox) that brings AI-powered grammar checking, rewriting, and translation directly into any text field on the web — no copy-pasting, no context switching.
 

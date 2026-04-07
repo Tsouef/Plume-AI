@@ -1,6 +1,6 @@
 {
   "popup": {
-    "heading": "Grammar Assistant",
+    "heading": "Plume AI",
     "provider": "Aanbieder",
     "apiKeyRequired": "API-sleutel vereist",
     "baseUrl": "Basis-URL",
@@ -32,7 +32,7 @@
     "disableSite": "Uitschakelen"
   },
   "panel": {
-    "panelLabel": "Grammatica-assistent",
+    "panelLabel": "Plume AI",
     "checking": "Controleren…",
     "translating": "Vertalen…",
     "rewriting": "Herschrijven…",
@@ -51,7 +51,7 @@
     "go": "Ga",
     "configureProvider": "Configureer een aanbieder in de instellingen",
     "openSettings": "Instellingen openen",
-    "openPanel": "Grammatica-assistent openen",
+    "openPanel": "Plume AI openen",
     "toneOptions": "Toon herschrijven"
   },
   "tone": {

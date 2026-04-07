@@ -55,7 +55,7 @@ describe('useGrammarCheck', () => {
       result.current('Hello world')
     })
 
-    expect(check).toHaveBeenCalledWith('Hello world')
+    expect(check).toHaveBeenCalledWith('Hello world', false)
   })
 
   it('cancels checker on unmount', () => {

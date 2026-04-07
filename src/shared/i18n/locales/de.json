@@ -1,6 +1,6 @@
 {
   "popup": {
-    "heading": "Grammar Assistant",
+    "heading": "Plume AI",
     "provider": "Anbieter",
     "apiKeyRequired": "API-Schlüssel erforderlich",
     "baseUrl": "Basis-URL",
@@ -32,7 +32,7 @@
     "disableSite": "Deaktivieren"
   },
   "panel": {
-    "panelLabel": "Grammatik-Assistent",
+    "panelLabel": "Plume AI",
     "checking": "Prüfen…",
     "translating": "Übersetzen…",
     "rewriting": "Umschreiben…",
@@ -51,7 +51,7 @@
     "go": "Los",
     "configureProvider": "Einen Anbieter in den Einstellungen konfigurieren",
     "openSettings": "Einstellungen öffnen",
-    "openPanel": "Grammatik-Assistent öffnen",
+    "openPanel": "Plume AI öffnen",
     "toneOptions": "Ton anpassen"
   },
   "tone": {

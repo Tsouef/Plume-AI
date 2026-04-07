@@ -1,9 +1,5 @@
 /* ─── SavedMessage ───────────────────────────────────────────────────────── */
 
-.toastRoot {
-  all: unset;
-}
-
 .savedMsg {
   text-align: center;
   margin-top: 8px;

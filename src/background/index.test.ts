@@ -246,7 +246,7 @@ describe('tabs.onUpdated — trusted domain auto-inject', () => {
 
     expect(execScript).toHaveBeenCalledWith({
       target: { tabId: 42 },
-      files: ['src/content/index.tsx'],
+      files: ['src/content/index.js'],
     })
   })
 

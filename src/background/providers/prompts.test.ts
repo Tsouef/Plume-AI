@@ -48,6 +48,21 @@ describe('buildGrammarPrompt', () => {
     const result = buildGrammarPrompt('Hello', 'auto', 'en')
     expect(result.system).toContain('1-2 sentence')
   })
+
+  it('example messages are in the ui language, not the text language (regression: ISSUE-003)', () => {
+    // When uiLanguage is French, the example output messages must be in French
+    // even though the example input text is English.
+    // Regression introduced by 25bd087: enriched examples hardcoded English messages
+    // for the English-text example, teaching the model "text language = explanation language".
+    const result = buildGrammarPrompt('Hello world', 'auto', 'fr')
+    // The English example's messages must appear in French
+    expect(result.system).toContain("Le sujet 'I'")
+  })
+
+  it('example messages are in English for English ui language', () => {
+    const result = buildGrammarPrompt('Hello world', 'auto', 'en')
+    expect(result.system).toContain("The subject 'I'")
+  })
 })
 
 describe('buildTranslatePrompt', () => {

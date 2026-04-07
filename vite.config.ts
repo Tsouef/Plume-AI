@@ -10,6 +10,7 @@ export default defineConfig({
     webExtension({
       manifest: './manifest.json',
       browser,
+      additionalInputs: ['src/content/index.tsx'],
       transformManifest(manifest) {
         if (browser === 'firefox') {
           if (manifest.background && 'service_worker' in manifest.background) {

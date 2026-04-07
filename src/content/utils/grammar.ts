@@ -54,7 +54,7 @@ export function createGrammarChecker(
   delay = GRAMMAR_DEBOUNCE_MS,
   onStart?: () => void,
   onSkip?: () => void
-): { check: (text: string) => void; cancel: () => void } {
+): { check: (text: string, force?: boolean) => void; cancel: () => void } {
   let timer: ReturnType<typeof setTimeout> | null = null
   let backoffUntil = 0
   let requestId = 0
@@ -74,7 +74,7 @@ export function createGrammarChecker(
     if (cache.length > GRAMMAR_CACHE_SIZE) cache.pop()
   }
 
-  function check(text: string): void {
+  function check(text: string, force = false): void {
     const cached = cacheGet(text)
     if (cached !== null) {
       lastCheckedText = text
@@ -100,7 +100,7 @@ export function createGrammarChecker(
         return
       }
 
-      if (lastCheckedText !== null && isSmallDiff(lastCheckedText, text)) {
+      if (!force && lastCheckedText !== null && isSmallDiff(lastCheckedText, text)) {
         onSkip?.()
         return
       }

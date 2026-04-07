@@ -209,6 +209,27 @@ describe('createGrammarChecker', () => {
     expect(mockSend).toHaveBeenCalledTimes(2)
   })
 
+  it('force=true bypasses isSmallDiff skip', async () => {
+    const onSkip = vi.fn()
+    mockSend.mockResolvedValue({ errors: [] })
+    const { check } = createGrammarChecker('en-US', 'en', vi.fn(), vi.fn(), 600, undefined, onSkip)
+
+    // First check sets lastCheckedText
+    check('Hello world')
+    await vi.advanceTimersByTimeAsync(600)
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(mockSend).toHaveBeenCalledTimes(1)
+
+    // Small diff would normally skip — but force=true bypasses it
+    check('Hello world!', true)
+    await vi.advanceTimersByTimeAsync(600)
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(mockSend).toHaveBeenCalledTimes(2)
+    expect(onSkip).not.toHaveBeenCalled()
+  })
+
   it('does not skip on first check (no previous text)', async () => {
     mockSend.mockResolvedValue({ errors: [] })
     const { check } = createGrammarChecker('en-US', 'en', vi.fn(), vi.fn(), 600)
