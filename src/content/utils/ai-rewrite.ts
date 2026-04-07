@@ -1,6 +1,7 @@
 import type { AIRewriteMessage, AIRewriteResponse, TonePreset } from '../../shared/types'
 import { toErrorMessage, MAX_GRAMMAR_TEXT_LENGTH } from '../../shared/constants'
 import { sendBackgroundMessage } from './messaging'
+import { anonymizePii } from '../../shared/pii'
 import i18n from '../../shared/i18n/i18n'
 
 export function requestAIRewrite(
@@ -36,8 +37,8 @@ export function requestAIRewrite(
 
   const message: AIRewriteMessage = {
     type: 'AI_REWRITE',
-    text,
-    selection: selectionText,
+    text: anonymizePii(text),
+    selection: selectionText ? anonymizePii(selectionText) : undefined,
     language,
     tone,
   }

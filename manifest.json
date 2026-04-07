@@ -3,7 +3,8 @@
   "name": "Grammar Assistant",
   "version": "1.0.0",
   "description": "On-demand grammar checking and AI rewriting for any web text field",
-  "permissions": ["storage", "scripting"],
+  "permissions": ["storage", "scripting", "activeTab", "tabs"],
+  "optional_host_permissions": ["<all_urls>"],
   "commands": {
     "open-panel": {
       "suggested_key": {
@@ -13,7 +14,6 @@
       "description": "Open grammar panel on focused field"
     }
   },
-  "host_permissions": ["<all_urls>"],
   "browser_specific_settings": {
     "gecko": {
       "id": "grammar-assistant@tsouef.dev",
@@ -25,13 +25,6 @@
     "service_worker": "src/background/index.ts",
     "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["src/content/index.tsx"],
-      "run_at": "document_idle"
-    }
-  ],
   "action": {
     "default_popup": "src/popup/index.html",
     "default_icon": {

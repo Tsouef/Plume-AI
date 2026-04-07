@@ -50,4 +50,16 @@ describe('TriggerButton component', () => {
     screen.getByText('✦').click()
     expect(onClick).toHaveBeenCalledOnce()
   })
+
+  it('button has defensive inline styles that override host-page resets', () => {
+    const field = document.createElement('div')
+    document.body.appendChild(field)
+    render(<TriggerButton field={field} onClick={vi.fn()} />)
+    const btn = screen.getByRole('button')
+    const style = btn.getAttribute('style') ?? ''
+    expect(style).toContain('padding: 0px')
+    expect(style).toContain('margin: 0px')
+    expect(style).toContain('box-sizing: border-box')
+    expect(style).toContain('line-height: 1')
+  })
 })

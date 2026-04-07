@@ -1,4 +1,5 @@
 import type React from 'react'
+import { forwardRef, useImperativeHandle, useEffect, useRef } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -9,8 +10,39 @@ import { makeError } from '../../../test-utils/grammar-error'
 
 // ShadowPortal creates a shadow root which jsdom doesn't support — mock it to
 // render children directly so we can assert on the rendered output.
+// The ref is forwarded with a host property so useFloatingPosition can work.
 vi.mock('../ShadowPortal/ShadowPortal', () => ({
-  ShadowPortal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ShadowPortal: forwardRef(function ShadowPortalMock(
+    {
+      children,
+      onHostMount,
+    }: { children: React.ReactNode; onHostMount?: (host: HTMLElement) => void },
+    ref: React.Ref<{ host: HTMLElement | undefined }>
+  ) {
+    const divRef = useRef<HTMLDivElement>(null)
+    useImperativeHandle(ref, () => ({ host: divRef.current ?? undefined }))
+    useEffect(() => {
+      if (divRef.current) onHostMount?.(divRef.current)
+    }, [onHostMount])
+    return <div ref={divRef}>{children}</div>
+  }),
+}))
+
+const { mockAutoUpdate, mockComputePosition } = vi.hoisted(() => {
+  const mockAutoUpdate = vi.fn((_ref: unknown, _float: unknown, update: () => void) => {
+    update()
+    return vi.fn()
+  })
+  const mockComputePosition = vi.fn().mockResolvedValue({ x: 100, y: 200 })
+  return { mockAutoUpdate, mockComputePosition }
+})
+
+vi.mock('@floating-ui/dom', () => ({
+  computePosition: mockComputePosition,
+  autoUpdate: mockAutoUpdate,
+  flip: vi.fn(() => ({})),
+  shift: vi.fn(() => ({})),
+  offset: vi.fn(() => ({})),
 }))
 
 // Avoid animation complications in jsdom
@@ -169,6 +201,51 @@ describe('GrammarPanel — error display', () => {
     expect(document.querySelector('.btn-primary')).toBeNull()
   })
 
+  it('error item wraps word/arrow/fix in a header row', () => {
+    renderPanel({
+      state: {
+        type: 'results',
+        errors: [makeError('feedbacks', 'feedback')],
+        fieldText: 'context with feedbacks',
+      },
+    })
+    const header = document.querySelector('.error-item-header')
+    expect(header).not.toBeNull()
+    expect(header?.querySelector('.error-item-word')?.textContent).toBe('feedbacks')
+    expect(header?.querySelector('.error-item-fix')?.textContent).toBe('feedback')
+  })
+
+  it('error item renders explanation in a paragraph below the header', () => {
+    renderPanel({
+      state: {
+        type: 'results',
+        errors: [
+          makeError(
+            'feedbacks',
+            'feedback',
+            'context with feedbacks',
+            'The plural form is incorrect here.'
+          ),
+        ],
+        fieldText: 'context with feedbacks',
+      },
+    })
+    const reason = document.querySelector('.error-item-reason')
+    expect(reason?.tagName).toBe('P')
+    expect(reason?.textContent).toBe('The plural form is incorrect here.')
+  })
+
+  it('error item does not render explanation paragraph when message is empty', () => {
+    renderPanel({
+      state: {
+        type: 'results',
+        errors: [makeError('feedbacks', 'feedback', 'context with feedbacks', '')],
+        fieldText: 'context with feedbacks',
+      },
+    })
+    expect(document.querySelector('.error-item-reason')).toBeNull()
+  })
+
   it('Fix all triggers AI rewrite with grammar-fix tone', async () => {
     const props = renderPanel({
       state: {
@@ -272,9 +349,8 @@ describe('GrammarPanel — open settings CTA', () => {
   })
 })
 
-describe('GrammarPanel — scroll repositioning', () => {
+describe('GrammarPanel — collision-aware positioning', () => {
   beforeEach(() => {
-    // jsdom does not implement ResizeObserver — stub it out
     vi.stubGlobal(
       'ResizeObserver',
       class {
@@ -283,30 +359,29 @@ describe('GrammarPanel — scroll repositioning', () => {
         disconnect() {}
       }
     )
+    mockAutoUpdate.mockClear()
+    mockComputePosition.mockClear()
   })
 
-  it('calls reposition when window scroll event fires', async () => {
+  it('starts autoUpdate when panel opens with a field', async () => {
     const { waitFor } = await import('@testing-library/react')
 
     const field = document.createElement('div')
     field.setAttribute('contenteditable', 'true')
+    Object.defineProperty(field, 'getBoundingClientRect', {
+      value: () => ({
+        top: 400,
+        bottom: 450,
+        left: 100,
+        right: 400,
+        width: 300,
+        height: 50,
+        x: 100,
+        y: 400,
+        toJSON: () => ({}),
+      }),
+    })
     document.body.appendChild(field)
-
-    const getBoundingClientRect = vi.fn(
-      () =>
-        ({
-          top: 400,
-          bottom: 450,
-          left: 100,
-          right: 400,
-          width: 300,
-          height: 50,
-          x: 100,
-          y: 400,
-          toJSON: () => ({}),
-        }) as DOMRect
-    )
-    Object.defineProperty(field, 'getBoundingClientRect', { value: getBoundingClientRect })
 
     render(
       <GrammarPanel
@@ -322,13 +397,8 @@ describe('GrammarPanel — scroll repositioning', () => {
       />
     )
 
-    const initialCalls = getBoundingClientRect.mock.calls.length
-
-    // Dispatch scroll event
-    window.dispatchEvent(new Event('scroll'))
-
     await waitFor(() => {
-      expect(getBoundingClientRect.mock.calls.length).toBeGreaterThan(initialCalls)
+      expect(mockAutoUpdate).toHaveBeenCalled()
     })
 
     document.body.removeChild(field)
@@ -365,10 +435,10 @@ describe('GrammarPanel — tone preset pills', () => {
     expect(props.onRequestAI).toHaveBeenCalledWith('shorter')
   })
 
-  it('clicking ✦ Improve calls onRequestAI with no tone', async () => {
+  it('clicking ✦ Polish calls onRequestAI with no tone', async () => {
     const props = renderPanel({ state: { type: 'results', errors: [], fieldText: '' } })
-    const improveBtn = document.querySelector<HTMLButtonElement>('.btn-improve')!
-    await userEvent.click(improveBtn)
+    const polishBtn = document.querySelector<HTMLButtonElement>('.btn-polish')!
+    await userEvent.click(polishBtn)
     expect(props.onRequestAI).toHaveBeenCalledWith(undefined)
   })
 })

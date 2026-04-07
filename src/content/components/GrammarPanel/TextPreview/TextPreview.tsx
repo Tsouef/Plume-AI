@@ -24,12 +24,12 @@ export function TextPreview({ segments }: TextPreviewProps) {
         <ul className="error-list">
           {errorSegs.map((seg, i) => (
             <li key={i} className="error-item">
-              <span className="error-item-word">{seg.text}</span>
-              <span className="error-item-arrow">→</span>
-              <span className="error-item-fix">{seg.error!.replacement}</span>
-              {seg.error!.message && (
-                <span className="error-item-reason">{seg.error!.message}</span>
-              )}
+              <div className="error-item-header">
+                <span className="error-item-word">{seg.text}</span>
+                <span className="error-item-arrow">→</span>
+                <span className="error-item-fix">{seg.error!.replacement}</span>
+              </div>
+              {seg.error!.message && <p className="error-item-reason">{seg.error!.message}</p>}
             </li>
           ))}
         </ul>

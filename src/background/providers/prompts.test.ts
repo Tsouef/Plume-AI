@@ -43,6 +43,11 @@ describe('buildGrammarPrompt', () => {
     const result = buildGrammarPrompt('Hello', 'auto', 'fr')
     expect(result.system).toContain('French')
   })
+
+  it('system message asks for a 1-2 sentence rule explanation', () => {
+    const result = buildGrammarPrompt('Hello', 'auto', 'en')
+    expect(result.system).toContain('1-2 sentence')
+  })
 })
 
 describe('buildTranslatePrompt', () => {

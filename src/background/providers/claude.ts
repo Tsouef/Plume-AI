@@ -12,7 +12,8 @@ export class ClaudeProvider extends BaseProvider {
 
   private async post(
     messages: Array<{ role: string; content: string }>,
-    system?: string
+    system?: string,
+    signal?: AbortSignal
   ): Promise<string> {
     const response = await fetchWithTimeout(
       BASE_URL,
@@ -31,7 +32,8 @@ export class ClaudeProvider extends BaseProvider {
           messages,
         }),
       },
-      FETCH_TIMEOUT_MS
+      FETCH_TIMEOUT_MS,
+      signal
     )
 
     if (!response.ok) {
@@ -49,8 +51,12 @@ export class ClaudeProvider extends BaseProvider {
     return textBlock.text.trim()
   }
 
-  protected override async callGrammar(system: string, user: string): Promise<unknown> {
-    return this.post([{ role: 'user', content: user }], system)
+  protected override async callGrammar(
+    system: string,
+    user: string,
+    signal?: AbortSignal
+  ): Promise<unknown> {
+    return this.post([{ role: 'user', content: user }], system, signal)
   }
 
   protected async call(prompt: string): Promise<string> {

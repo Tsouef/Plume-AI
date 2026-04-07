@@ -36,14 +36,14 @@ BE EXHAUSTIVE. Scan word by word. Do not skip any mistake.
 Do NOT suggest style improvements or translations.
 
 Respond with a JSON object containing an "errors" array:
-{"errors": [{"original": "wrong phrase", "replacement": "corrected", "message": "explanation in ${explanationLang}", "context": "4-8 words around it"}]}
+{"errors": [{"original": "wrong phrase", "replacement": "corrected", "message": "1-2 sentence explanation in ${explanationLang} — state the rule and why this specific word/phrase violates it", "context": "4-8 words around it"}]}
 
 Examples:
 Input: "I has a apple."
-Output: {"errors": [{"original":"has","replacement":"have","message":"Subject-verb agreement error","context":"I has a apple"},{"original":"a","replacement":"an","message":"Use 'an' before vowels","context":"has a apple"}]}
+Output: {"errors": [{"original":"has","replacement":"have","message":"The subject 'I' requires the base form of the verb. 'Has' is the third-person singular form; use 'have' instead.","context":"I has a apple"},{"original":"a","replacement":"an","message":"Use 'an' before words starting with a vowel sound. 'Apple' begins with the /æ/ vowel sound, so 'an' is required.","context":"has a apple"}]}
 
 Input: "Je voudrai tenté de faire des fotes."
-Output: {"errors": [{"original":"voudrai","replacement":"voudrais","message":"Conditionnel requis ici","context":"Je voudrai tenté de"},{"original":"tenté","replacement":"tenter","message":"Infinitif requis après le verbe","context":"voudrai tenté de faire"},{"original":"fotes","replacement":"fautes","message":"Orthographe incorrecte","context":"faire des fotes"}]}`
+Output: {"errors": [{"original":"voudrai","replacement":"voudrais","message":"Le conditionnel présent de 'vouloir' requiert un 's' final à la première personne du singulier.","context":"Je voudrai tenté de"},{"original":"tenté","replacement":"tenter","message":"Après un verbe modal au conditionnel, le verbe suivant doit être à l'infinitif.","context":"voudrai tenté de faire"},{"original":"fotes","replacement":"fautes","message":"Orthographe incorrecte : le mot correct est 'fautes', nom féminin pluriel signifiant 'mistakes'.","context":"faire des fotes"}]}`
 
   const langInstruction = buildGrammarLangInstruction(language)
   const user = `${langInstruction}\n\nText:\n${text}`

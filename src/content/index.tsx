@@ -12,6 +12,7 @@ async function main() {
 
   const host = document.createElement('div')
   host.id = 'grammar-assistant-root'
+  host.style.cssText = 'all: initial; display: block; position: static;'
   document.body.appendChild(host)
 
   createRoot(host).render(

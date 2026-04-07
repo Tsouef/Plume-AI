@@ -1,16 +1,16 @@
 import {
-  type CSSProperties,
   useState,
   forwardRef,
   useImperativeHandle,
   useEffect,
+  useCallback,
   useRef,
   useMemo,
   memo,
 } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
-import { EASE_OUT, MAX_Z_INDEX } from '../../../shared/constants'
+import { EASE_OUT } from '../../../shared/constants'
 import { ShadowPortal, type ShadowPortalHandle } from '../ShadowPortal/ShadowPortal'
 import { PanelHeader } from './PanelHeader/PanelHeader'
 import { TonePillsBar } from './TonePillsBar/TonePillsBar'
@@ -20,6 +20,7 @@ import { TranslateBar } from './TranslateBar/TranslateBar'
 import { buildSegments } from '../../utils/segments'
 import type { PanelState } from '../../hooks/usePanelState'
 import type { TonePreset, ProviderId } from '../../../shared/types'
+import { useFloatingPosition } from '../../hooks/useFloatingPosition'
 
 export interface GrammarPanelHandle {
   isEventInside: (e: MouseEvent) => boolean
@@ -29,6 +30,7 @@ export interface GrammarPanelHandle {
 interface GrammarPanelProps {
   isOpen: boolean
   state: PanelState
+  isRechecking?: boolean
   field: HTMLElement | null
   theme?: string
   activeProvider: ProviderId
@@ -65,6 +67,7 @@ export const GrammarPanel = memo(
       {
         isOpen,
         state,
+        isRechecking,
         field,
         theme,
         activeProvider,
@@ -88,12 +91,6 @@ export const GrammarPanel = memo(
         [state]
       )
       const matchedErrorCount = segments ? segments.filter((s) => s.error).length : undefined
-      const [hostStyle, setHostStyle] = useState<CSSProperties>({
-        position: 'fixed',
-        zIndex: MAX_Z_INDEX,
-        display: 'none',
-      })
-
       useImperativeHandle(ref, () => ({
         isEventInside: (e: MouseEvent) => {
           const host = shadowRef.current?.host
@@ -117,38 +114,12 @@ export const GrammarPanel = memo(
         return () => host.removeEventListener('mousedown', onMouseDown)
       }, []) // runs once after shadow is created
 
-      // Reposition when field changes; show/hide when isOpen changes
-      useEffect(() => {
-        function reposition() {
-          if (!field) {
-            setHostStyle((prev) => ({ ...prev, display: 'none' }))
-            return
-          }
-          const rect = field.getBoundingClientRect()
-          setHostStyle({
-            position: 'fixed',
-            zIndex: MAX_Z_INDEX,
-            display: isOpen ? 'block' : 'none',
-            top: 'auto',
-            bottom: `${window.innerHeight - rect.top + 4}px`,
-            left: `${rect.left}px`,
-            width: `${rect.width}px`,
-          })
-        }
+      const [panelHostEl, setPanelHostEl] = useState<HTMLElement | null>(null)
+      const onHostMount = useCallback((host: HTMLElement) => {
+        setPanelHostEl(host)
+      }, [])
 
-        reposition()
-        if (!field) return
-
-        const resizeObserver = new ResizeObserver(reposition)
-        resizeObserver.observe(field)
-
-        window.addEventListener('scroll', reposition, { passive: true })
-
-        return () => {
-          resizeObserver.disconnect()
-          window.removeEventListener('scroll', reposition)
-        }
-      }, [field, isOpen])
+      const hostStyle = useFloatingPosition(field, panelHostEl, isOpen)
 
       return (
         <ShadowPortal
@@ -156,11 +127,12 @@ export const GrammarPanel = memo(
           id="grammar-assistant-panel-host"
           style={hostStyle}
           theme={theme}
+          onHostMount={onHostMount}
         >
           <AnimatePresence>
             {isOpen && (
               <motion.div
-                className="panel"
+                className={`panel${isRechecking ? ' panel--rechecking' : ''}`}
                 role="dialog"
                 aria-label={t('panel.panelLabel')}
                 aria-modal="true"
@@ -173,6 +145,7 @@ export const GrammarPanel = memo(
                   state={state}
                   matchedErrorCount={matchedErrorCount}
                   activeProvider={activeProvider}
+                  isRechecking={isRechecking}
                   onRequestAI={onRequestAI}
                   onOpenSettings={onOpenSettings}
                 />

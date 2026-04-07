@@ -7,6 +7,7 @@ interface PanelHeaderProps {
   state: PanelState
   matchedErrorCount?: number
   activeProvider: ProviderId
+  isRechecking?: boolean
   onRequestAI: (tone?: TonePreset) => void
   onOpenSettings?: () => void
 }
@@ -15,6 +16,7 @@ export function PanelHeader({
   state,
   matchedErrorCount,
   activeProvider,
+  isRechecking,
   onRequestAI,
   onOpenSettings,
 }: PanelHeaderProps) {
@@ -93,6 +95,14 @@ export function PanelHeader({
     }
 
     if (state.type === 'results') {
+      if (isRechecking) {
+        return (
+          <span className="status">
+            <Spinner />
+            {t('panel.checking')}
+          </span>
+        )
+      }
       const count = matchedErrorCount ?? state.errors.length
       if (count === 0) {
         return <span className="status">✅ {t('panel.looksGood')}</span>
@@ -108,14 +118,14 @@ export function PanelHeader({
     return null
   }
 
-  const showImproveButton = state.type === 'results'
+  const showPolishButton = state.type === 'results'
 
   return (
     <div className="header">
       {renderStatus()}
-      {showImproveButton && (
-        <button className="btn-improve" onClick={() => onRequestAI(undefined)}>
-          {t('panel.improve')}
+      {showPolishButton && (
+        <button className="btn-polish" onClick={() => onRequestAI(undefined)}>
+          {t('panel.polish')}
         </button>
       )}
       {activeProvider === 'ollama' && (

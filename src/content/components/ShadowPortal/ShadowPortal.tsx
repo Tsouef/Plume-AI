@@ -19,10 +19,11 @@ interface ShadowPortalProps {
   style?: CSSProperties
   id?: string
   theme?: string
+  onHostMount?: (host: HTMLElement) => void
 }
 
 export const ShadowPortal = forwardRef<ShadowPortalHandle, ShadowPortalProps>(
-  ({ children, style, id, theme }, ref) => {
+  ({ children, style, id, theme, onHostMount }, ref) => {
     const hostRef = useRef<HTMLDivElement>(null)
     const [mountPoint, setMountPoint] = useState<HTMLElement | null>(null)
 
@@ -45,7 +46,8 @@ export const ShadowPortal = forwardRef<ShadowPortalHandle, ShadowPortalProps>(
       const mount = document.createElement('div')
       shadow.appendChild(mount)
       setMountPoint(mount)
-    }, [])
+      onHostMount?.(host)
+    }, [onHostMount])
 
     return (
       <>

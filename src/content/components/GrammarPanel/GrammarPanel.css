@@ -72,6 +72,32 @@
   z-index: 1;
 }
 
+/* Rechecking: scanning shimmer sweeps across the top accent bar */
+@keyframes rechecking-scan {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -50% center;
+  }
+}
+
+.panel--rechecking::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent) 20%,
+    rgba(255, 255, 255, 0.85) 35%,
+    var(--accent-blue) 50%,
+    transparent 68%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  animation: rechecking-scan 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  opacity: 1;
+  height: 2px;
+}
+
 /* Thin scrollbar */
 .panel::-webkit-scrollbar {
   width: 4px;
@@ -134,7 +160,7 @@
   background: rgba(0, 0, 0, 0.06);
 }
 
-:host([data-theme='light']) .btn-improve:disabled {
+:host([data-theme='light']) .btn-polish:disabled {
   background: rgba(0, 0, 0, 0.07);
   color: var(--text-muted);
 }

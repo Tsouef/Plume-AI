@@ -23,7 +23,13 @@
     "testConnectionError": "Verbindung fehlgeschlagen",
     "save": "Einstellungen speichern",
     "saved": "Gespeichert",
-    "showHide": "Anzeigen/verbergen"
+    "showHide": "Anzeigen/verbergen",
+    "checkMode": "Prüfmodus",
+    "checkModeAuto": "Auto",
+    "checkModeManual": "Manuell",
+    "currentSite": "Aktuelle Seite",
+    "enableSite": "Hier aktivieren",
+    "disableSite": "Deaktivieren"
   },
   "panel": {
     "panelLabel": "Grammatik-Assistent",
@@ -35,7 +41,7 @@
     "looksGood": "Alles in Ordnung",
     "issueCount_one": "{{count}} Fehler",
     "issueCount_other": "{{count}} Fehler",
-    "improve": "✦ Verbessern",
+    "polish": "✦ Verfeinern",
     "fixAll": "Alle korrigieren",
     "localMode": "Lokal — keine Daten gesendet",
     "useThisVersion": "Diese Version verwenden",

@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ClaudeProvider } from './claude'
 import { OpenAIProvider } from './openai'
 import { MistralProvider } from './mistral'
+import { GeminiProvider } from './gemini'
+import { OllamaProvider } from './ollama'
 
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn())
@@ -180,5 +182,65 @@ describe('MistralProvider — grammar JSON mode', () => {
     await new MistralProvider('key').checkGrammar('test', 'auto', 'en')
     const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string)
     expect(body.response_format?.type).toBe('json_object')
+  })
+})
+
+describe('AbortSignal support — ClaudeProvider', () => {
+  it('rejects with AbortError when a pre-aborted signal is passed', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    await expect(
+      new ClaudeProvider('key').checkGrammar('test', 'auto', 'en', controller.signal)
+    ).rejects.toMatchObject({ name: 'AbortError' })
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled()
+  })
+})
+
+describe('AbortSignal support — OpenAIProvider', () => {
+  it('rejects with AbortError when a pre-aborted signal is passed', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    await expect(
+      new OpenAIProvider('key').checkGrammar('test', 'auto', 'en', controller.signal)
+    ).rejects.toMatchObject({ name: 'AbortError' })
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled()
+  })
+})
+
+describe('AbortSignal support — MistralProvider', () => {
+  it('rejects with AbortError when a pre-aborted signal is passed', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    await expect(
+      new MistralProvider('key').checkGrammar('test', 'auto', 'en', controller.signal)
+    ).rejects.toMatchObject({ name: 'AbortError' })
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled()
+  })
+})
+
+describe('AbortSignal support — GeminiProvider', () => {
+  it('rejects with AbortError when a pre-aborted signal is passed', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    await expect(
+      new GeminiProvider('key').checkGrammar('test', 'auto', 'en', controller.signal)
+    ).rejects.toMatchObject({ name: 'AbortError' })
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled()
+  })
+})
+
+describe('AbortSignal support — OllamaProvider', () => {
+  it('rejects with AbortError when a pre-aborted signal is passed', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    await expect(
+      new OllamaProvider('http://localhost:11434', 'llama3').checkGrammar(
+        'test',
+        'auto',
+        'en',
+        controller.signal
+      )
+    ).rejects.toMatchObject({ name: 'AbortError' })
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled()
   })
 })

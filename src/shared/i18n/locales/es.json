@@ -23,7 +23,13 @@
     "testConnectionError": "Conexión fallida",
     "save": "Guardar ajustes",
     "saved": "Guardado",
-    "showHide": "Mostrar/ocultar"
+    "showHide": "Mostrar/ocultar",
+    "checkMode": "Modo de revisión",
+    "checkModeAuto": "Auto",
+    "checkModeManual": "Manual",
+    "currentSite": "Sitio actual",
+    "enableSite": "Activar aquí",
+    "disableSite": "Desactivar"
   },
   "panel": {
     "panelLabel": "Asistente gramatical",
@@ -35,7 +41,7 @@
     "looksGood": "Sin errores",
     "issueCount_one": "{{count}} error",
     "issueCount_other": "{{count}} errores",
-    "improve": "✦ Mejorar",
+    "polish": "✦ Pulir",
     "fixAll": "Corregir todo",
     "localMode": "Local — sin datos enviados",
     "useThisVersion": "Usar esta versión",

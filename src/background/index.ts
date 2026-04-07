@@ -3,6 +3,8 @@ import { fetchOllamaModels } from './providers/ollama'
 import { getConfig } from '../shared/storage'
 import type { BackgroundMessage, BackgroundResponse } from '../shared/types'
 
+let currentGrammarAbort: AbortController | null = null
+
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== 'open-panel') return
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
@@ -20,6 +22,28 @@ chrome.commands.onCommand.addListener(async (command) => {
     } catch {
       // Tab not injectable (chrome:// pages, etc.) — silently ignore
     }
+  }
+})
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status !== 'complete' || !tab.url) return
+  let hostname: string
+  try {
+    const parsed = new URL(tab.url)
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return
+    hostname = parsed.hostname
+  } catch {
+    return
+  }
+  try {
+    const config = await getConfig()
+    if (!config.trustedDomains.includes(hostname)) return
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['src/content/index.tsx'],
+    })
+  } catch {
+    // Storage unavailable, already injected, or tab not injectable
   }
 })
 
@@ -44,8 +68,23 @@ export async function handleMessage(message: BackgroundMessage): Promise<Backgro
   const provider = getActiveProvider(config)
 
   if (message.type === 'CHECK_GRAMMAR') {
-    const errors = await provider.checkGrammar(message.text, message.language, message.uiLanguage)
-    return { errors }
+    currentGrammarAbort?.abort()
+    currentGrammarAbort = new AbortController()
+    const signal = currentGrammarAbort.signal
+    try {
+      const errors = await provider.checkGrammar(
+        message.text,
+        message.language,
+        message.uiLanguage,
+        signal
+      )
+      return { errors }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return { errors: [] }
+      }
+      throw err
+    }
   }
   if (message.type === 'AI_REWRITE') {
     const rewritten = await provider.rewrite(

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useGrammarCheck } from './useGrammarCheck'
 import * as grammarModule from '../utils/grammar'
+import { GRAMMAR_DEBOUNCE_MS } from '../../shared/constants'
 
 vi.mock('../utils/grammar', () => ({
   createGrammarChecker: vi.fn(),
@@ -36,7 +37,9 @@ describe('useGrammarCheck', () => {
       'en',
       expect.any(Function),
       expect.any(Function),
-      500
+      500,
+      expect.any(Function),
+      expect.any(Function)
     )
     expect(check).not.toHaveBeenCalled()
     expect(cancel).not.toHaveBeenCalled()
@@ -83,7 +86,9 @@ describe('useGrammarCheck', () => {
       'en',
       expect.any(Function),
       expect.any(Function),
-      1000
+      GRAMMAR_DEBOUNCE_MS,
+      expect.any(Function),
+      expect.any(Function)
     )
   })
 

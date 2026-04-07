@@ -1,20 +1,26 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 
 // vi.hoisted runs before any module is evaluated, allowing us to stub chrome
 // before index.ts registers chrome.runtime.onMessage.addListener at module load time.
-vi.hoisted(() => {
+const { captureOnUpdated } = vi.hoisted(() => {
+  const onUpdatedAddListener = vi.fn()
   vi.stubGlobal('chrome', {
     commands: {
       onCommand: { addListener: vi.fn() },
+    },
+    tabs: {
+      onUpdated: { addListener: onUpdatedAddListener },
     },
     runtime: {
       id: 'test-ext',
       onMessage: { addListener: vi.fn() },
     },
   })
+  return { captureOnUpdated: onUpdatedAddListener }
 })
 
 import { handleMessage } from './index'
+import { DEFAULT_CONFIG } from '../shared/config-defaults'
 
 vi.mock('./provider-factory', () => ({
   getActiveProvider: vi.fn(),
@@ -76,7 +82,36 @@ describe('handleMessage — CHECK_GRAMMAR', () => {
     })
 
     expect(result).toEqual({ errors })
-    expect(provider.checkGrammar).toHaveBeenCalledWith('test', 'en', 'en')
+    expect(provider.checkGrammar).toHaveBeenCalledWith('test', 'en', 'en', expect.any(AbortSignal))
+  })
+
+  it('passes an AbortSignal to provider.checkGrammar', async () => {
+    const provider = makeProvider()
+    provider.checkGrammar.mockResolvedValue([])
+
+    await handleMessage({
+      type: 'CHECK_GRAMMAR',
+      text: 'test',
+      language: 'en',
+      uiLanguage: 'en',
+    })
+
+    expect(provider.checkGrammar).toHaveBeenCalledWith('test', 'en', 'en', expect.any(AbortSignal))
+  })
+
+  it('returns { errors: [] } when grammar check throws AbortError', async () => {
+    const provider = makeProvider()
+    const abortError = new DOMException('Aborted', 'AbortError')
+    provider.checkGrammar.mockRejectedValue(abortError)
+
+    const result = await handleMessage({
+      type: 'CHECK_GRAMMAR',
+      text: 'test',
+      language: 'en',
+      uiLanguage: 'en',
+    })
+
+    expect(result).toEqual({ errors: [] })
   })
 })
 
@@ -182,5 +217,84 @@ describe('handleMessage — TEST_CONNECTION', () => {
       apiKey: 'bad-key',
     })
     expect(result).toEqual({ ok: false, error: 'Invalid API key' })
+  })
+})
+
+describe('tabs.onUpdated — trusted domain auto-inject', () => {
+  let onUpdatedHandler: (
+    tabId: number,
+    changeInfo: Record<string, unknown>,
+    tab: { url?: string }
+  ) => Promise<void>
+
+  beforeAll(() => {
+    onUpdatedHandler = captureOnUpdated.mock.calls[0][0]
+  })
+
+  it('injects content script when tab finishes loading on a trusted domain', async () => {
+    const execScript = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('chrome', {
+      scripting: { executeScript: execScript },
+      runtime: { id: 'test-ext' },
+    })
+    mockGetConfig.mockResolvedValue({
+      ...DEFAULT_CONFIG,
+      trustedDomains: ['example.com'],
+    } as never)
+
+    await onUpdatedHandler(42, { status: 'complete' }, { url: 'https://example.com/page' })
+
+    expect(execScript).toHaveBeenCalledWith({
+      target: { tabId: 42 },
+      files: ['src/content/index.tsx'],
+    })
+  })
+
+  it('does not inject when domain is not in trustedDomains', async () => {
+    const execScript = vi.fn()
+    vi.stubGlobal('chrome', {
+      scripting: { executeScript: execScript },
+      runtime: { id: 'test-ext' },
+    })
+    mockGetConfig.mockResolvedValue({
+      ...DEFAULT_CONFIG,
+      trustedDomains: [],
+    } as never)
+
+    await onUpdatedHandler(42, { status: 'complete' }, { url: 'https://example.com/page' })
+
+    expect(execScript).not.toHaveBeenCalled()
+  })
+
+  it('does not inject when changeInfo.status is not "complete"', async () => {
+    const execScript = vi.fn()
+    vi.stubGlobal('chrome', {
+      scripting: { executeScript: execScript },
+      runtime: { id: 'test-ext' },
+    })
+    mockGetConfig.mockResolvedValue({
+      ...DEFAULT_CONFIG,
+      trustedDomains: ['example.com'],
+    } as never)
+
+    await onUpdatedHandler(42, { status: 'loading' }, { url: 'https://example.com/page' })
+
+    expect(execScript).not.toHaveBeenCalled()
+  })
+
+  it('does not inject on non-http(s) URLs', async () => {
+    const execScript = vi.fn()
+    vi.stubGlobal('chrome', {
+      scripting: { executeScript: execScript },
+      runtime: { id: 'test-ext' },
+    })
+    mockGetConfig.mockResolvedValue({
+      ...DEFAULT_CONFIG,
+      trustedDomains: ['newtab'],
+    } as never)
+
+    await onUpdatedHandler(42, { status: 'complete' }, { url: 'chrome://newtab/' })
+
+    expect(execScript).not.toHaveBeenCalled()
   })
 })

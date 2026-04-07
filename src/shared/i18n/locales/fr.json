@@ -23,7 +23,13 @@
     "testConnectionError": "Connexion échouée",
     "save": "Enregistrer",
     "saved": "Enregistré",
-    "showHide": "Afficher/masquer"
+    "showHide": "Afficher/masquer",
+    "checkMode": "Mode de vérification",
+    "checkModeAuto": "Auto",
+    "checkModeManual": "Manuel",
+    "currentSite": "Site actuel",
+    "enableSite": "Activer ici",
+    "disableSite": "Désactiver"
   },
   "panel": {
     "panelLabel": "Assistant grammatical",
@@ -35,7 +41,7 @@
     "looksGood": "Aucune erreur",
     "issueCount_one": "{{count}} erreur",
     "issueCount_other": "{{count}} erreurs",
-    "improve": "✦ Améliorer",
+    "polish": "✦ Peaufiner",
     "fixAll": "Tout corriger",
     "localMode": "Local — aucune donnée envoyée",
     "useThisVersion": "Utiliser cette version",

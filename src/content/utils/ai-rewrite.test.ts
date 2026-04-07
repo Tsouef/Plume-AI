@@ -67,6 +67,16 @@ describe('requestAIRewrite', () => {
       expect(onError).toHaveBeenCalledWith('Rate limit — please wait a moment')
     )
   })
+
+  it('strips email from text before sending AI_REWRITE', async () => {
+    mockSend.mockResolvedValue({ rewritten: 'cleaned' })
+    requestAIRewrite(makeField('Write to admin@corp.com about the issue'), 'en', vi.fn(), vi.fn())
+    await vi.waitFor(() =>
+      expect(mockSend).toHaveBeenCalledWith(
+        expect.objectContaining({ text: 'Write to [EMAIL] about the issue' })
+      )
+    )
+  })
 })
 
 describe('requestAIRewrite — length limit', () => {

@@ -1,0 +1,43 @@
+/* ─── ManualModeSection ──────────────────────────────────────────────────── */
+
+.group {
+  display: flex;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  border: 1px solid var(--border-primary);
+  gap: 2px;
+}
+
+.btn {
+  flex: 1;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition:
+    color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+  letter-spacing: 0.01em;
+}
+
+.btn:hover:not(.active) {
+  color: var(--text-secondary);
+  background: var(--btn-ghost-bg);
+}
+
+.btn.active {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}

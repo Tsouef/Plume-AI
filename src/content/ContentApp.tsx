@@ -24,6 +24,7 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
     isPanelOpen,
     panelField,
     state,
+    isRechecking,
     openPanel,
     closePanel,
     handleRequestAI,
@@ -66,6 +67,7 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
         ref={panelRef}
         isOpen={isPanelOpen}
         state={state}
+        isRechecking={isRechecking}
         field={panelField}
         theme={config.uiTheme ?? 'dark'}
         activeProvider={config.activeProvider}

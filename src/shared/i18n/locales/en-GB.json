@@ -4,6 +4,12 @@
     "saved": "Saved",
     "uiTheme": "Appearance",
     "themeDark": "Dark",
-    "themeLight": "Light"
+    "themeLight": "Light",
+    "checkMode": "Check mode",
+    "checkModeAuto": "Auto",
+    "checkModeManual": "Manual",
+    "currentSite": "Current site",
+    "enableSite": "Enable here",
+    "disableSite": "Disable"
   }
 }

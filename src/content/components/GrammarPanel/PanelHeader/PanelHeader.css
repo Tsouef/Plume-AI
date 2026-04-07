@@ -43,9 +43,9 @@
   color: var(--accent-blue);
 }
 
-/* ─── Improve button ─────────────────────────────────────────────────────── */
+/* ─── Polish button ──────────────────────────────────────────────────────── */
 
-.btn-improve {
+.btn-polish {
   padding: 4px 11px;
   background: linear-gradient(135deg, var(--accent), var(--accent-blue));
   color: #0a0b10;
@@ -62,12 +62,12 @@
   letter-spacing: -0.01em;
 }
 
-.btn-improve:hover:not(:disabled) {
+.btn-polish:hover:not(:disabled) {
   filter: brightness(1.12);
   box-shadow: 0 0 14px var(--accent-glow);
 }
 
-.btn-improve:disabled {
+.btn-polish:disabled {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
   cursor: default;

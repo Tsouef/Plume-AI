@@ -20,6 +20,8 @@ const base: Config = {
   uiLanguage: 'en',
   uiTheme: 'dark',
   disabledDomains: [],
+  manualOnly: false,
+  trustedDomains: [],
 }
 
 describe('getActiveProvider', () => {

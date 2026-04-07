@@ -18,6 +18,8 @@ export interface Config {
   uiLanguage: UiLocale
   uiTheme: UiTheme
   disabledDomains: string[]
+  manualOnly: boolean
+  trustedDomains: string[]
 }
 
 export interface GrammarError {

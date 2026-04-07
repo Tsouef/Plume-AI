@@ -20,6 +20,11 @@ const BUTTON_STYLE: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   boxShadow: '0 2px 12px rgba(0,212,170,0.35),0 0 0 2px rgba(0,212,170,0.1)',
+  padding: 0,
+  margin: 0,
+  boxSizing: 'border-box',
+  lineHeight: 1,
+  outline: 'none',
 }
 
 interface TriggerButtonProps {

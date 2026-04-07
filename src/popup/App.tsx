@@ -12,7 +12,9 @@ import type { PerProviderState } from './components/ProviderSection/ProviderSect
 import { LanguageSection } from './components/LanguageSection/LanguageSection'
 import { UiLanguageSection } from './components/UiLanguageSection/UiLanguageSection'
 import { ThemeSection } from './components/ThemeSection/ThemeSection'
+import { ManualModeSection } from './components/ManualModeSection/ManualModeSection'
 import { DisabledSitesSection } from './components/DisabledSitesSection/DisabledSitesSection'
+import { SitePermissionSection } from './components/SitePermissionSection/SitePermissionSection'
 import { SaveButton } from './components/SaveButton/SaveButton'
 import { SavedMessage } from './components/SavedMessage/SavedMessage'
 
@@ -65,7 +67,9 @@ function AppForm({ config, saveConfig }: AppFormProps) {
   const [language, setLanguage] = useState<Config['language']>(config.language)
   const [uiLanguage, setUiLanguage] = useState<UiLocale>(config.uiLanguage)
   const [uiTheme, setUiTheme] = useState<UiTheme>(config.uiTheme ?? 'dark')
+  const [manualOnly, setManualOnly] = useState(config.manualOnly ?? false)
   const [domains, setDomains] = useState([...config.disabledDomains])
+  const [trustedDomains, setTrustedDomains] = useState([...config.trustedDomains])
   const [errors, setErrors] = useState<{ apiKey?: boolean; baseUrl?: boolean; model?: boolean }>({})
   const [savedVisible, setSavedVisible] = useState(false)
 
@@ -131,6 +135,22 @@ function AppForm({ config, saveConfig }: AppFormProps) {
     saveConfig({ ...config, disabledDomains: newDomains })
   }
 
+  async function handleGrantDomain(domain: string) {
+    const granted = await chrome.permissions.request({ origins: [`*://${domain}/*`] })
+    if (!granted) return
+    const newDomains = [...trustedDomains, domain]
+    setTrustedDomains(newDomains)
+    saveConfig({ ...config, trustedDomains: newDomains })
+  }
+
+  async function handleRevokeDomain(domain: string) {
+    const removed = await chrome.permissions.remove({ origins: [`*://${domain}/*`] })
+    if (!removed) return
+    const newDomains = trustedDomains.filter((d) => d !== domain)
+    setTrustedDomains(newDomains)
+    saveConfig({ ...config, trustedDomains: newDomains })
+  }
+
   async function handleSave() {
     const state = providerStates[activeProvider]
     if (activeProvider !== 'ollama' && !state.apiKey.trim()) {
@@ -160,6 +180,8 @@ function AppForm({ config, saveConfig }: AppFormProps) {
       uiLanguage,
       uiTheme,
       disabledDomains: domains,
+      manualOnly,
+      trustedDomains,
     }
     await saveConfig(newConfig)
 
@@ -192,6 +214,9 @@ function AppForm({ config, saveConfig }: AppFormProps) {
           <UiLanguageSection value={uiLanguage} onChange={handleUiLanguageChange} />
         </motion.div>
         <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <ManualModeSection value={manualOnly} onChange={setManualOnly} />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
           <ThemeSection value={uiTheme} onChange={handleUiThemeChange} />
         </motion.div>
         <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
@@ -199,6 +224,13 @@ function AppForm({ config, saveConfig }: AppFormProps) {
             domains={domains}
             onAdd={handleAddDomain}
             onRemove={handleRemoveDomain}
+          />
+        </motion.div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <SitePermissionSection
+            trustedDomains={trustedDomains}
+            onGrant={handleGrantDomain}
+            onRevoke={handleRevokeDomain}
           />
         </motion.div>
         <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>

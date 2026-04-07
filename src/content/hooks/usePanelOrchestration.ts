@@ -10,6 +10,7 @@ import type { GrammarPanelHandle } from '../components/GrammarPanel/GrammarPanel
 import type { Config, TonePreset, TranslateMessage, TranslateResponse } from '../../shared/types'
 import { toErrorMessage, MAX_GRAMMAR_TEXT_LENGTH } from '../../shared/constants'
 import i18n from '../../shared/i18n/i18n'
+import { anonymizePii } from '../../shared/pii'
 
 export function usePanelOrchestration(config: Config) {
   const panelRef = useRef<GrammarPanelHandle>(null)
@@ -26,6 +27,7 @@ export function usePanelOrchestration(config: Config) {
   const panelState = usePanelState()
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [panelField, setPanelField] = useState<HTMLElement | null>(null)
+  const [isRechecking, setIsRechecking] = useState(false)
   const panelFieldRef = useRef<HTMLElement | null>(null)
   const savedRangeRef = useRef<Range | undefined>(undefined)
   const translateRequestIdRef = useRef(0)
@@ -34,8 +36,15 @@ export function usePanelOrchestration(config: Config) {
   const grammarCheck = useGrammarCheck({
     language: config.language,
     uiLanguage: config.uiLanguage,
-    onResults: panelState.setResults,
-    onError: panelState.setError,
+    onResults: (errors, fieldText) => {
+      setIsRechecking(false)
+      panelState.setResults(errors, fieldText)
+    },
+    onError: (msg) => {
+      setIsRechecking(false)
+      panelState.setError(msg)
+    },
+    onSkip: () => setIsRechecking(false),
   })
 
   const openPanel = useCallback(
@@ -46,19 +55,25 @@ export function usePanelOrchestration(config: Config) {
       panelState.setChecking()
       grammarCheck(field.textContent ?? '')
 
-      // Wire input listener for live re-checking
+      // Wire input listener for live re-checking (skipped in manual-only mode)
       if (inputListenerRef.current) {
         field.removeEventListener('input', inputListenerRef.current)
       }
-      inputListenerRef.current = () => grammarCheck(field.textContent ?? '')
-      field.addEventListener('input', inputListenerRef.current)
+      if (!config.manualOnly) {
+        inputListenerRef.current = () => {
+          setIsRechecking(true)
+          grammarCheck(field.textContent ?? '')
+        }
+        field.addEventListener('input', inputListenerRef.current)
+      }
     },
-    [grammarCheck, panelState]
+    [grammarCheck, panelState, config.manualOnly]
   )
 
   const closePanel = useCallback(() => {
     setIsPanelOpen(false)
     setPanelField(null)
+    setIsRechecking(false)
     panelState.reset()
     const field = panelFieldRef.current
     if (field && inputListenerRef.current) {
@@ -132,7 +147,7 @@ export function usePanelOrchestration(config: Config) {
       const myId = ++translateRequestIdRef.current
       const message: TranslateMessage = {
         type: 'TRANSLATE',
-        text,
+        text: anonymizePii(text),
         targetLanguage: targetLang,
       }
       sendBackgroundMessage<TranslateResponse>(message)
@@ -155,6 +170,7 @@ export function usePanelOrchestration(config: Config) {
     isPanelOpen,
     panelField,
     state: panelState.state,
+    isRechecking,
     openPanel,
     closePanel,
     handleRequestAI,

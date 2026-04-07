@@ -11,7 +11,11 @@ export class GeminiProvider extends BaseProvider {
     super()
   }
 
-  protected override async callGrammar(system: string, user: string): Promise<unknown> {
+  protected override async callGrammar(
+    system: string,
+    user: string,
+    signal?: AbortSignal
+  ): Promise<unknown> {
     const response = await fetchWithTimeout(
       `${GEMINI_BASE}/${this.model}:generateContent?key=${this.apiKey}`,
       {
@@ -26,7 +30,8 @@ export class GeminiProvider extends BaseProvider {
           },
         }),
       },
-      FETCH_TIMEOUT_MS
+      FETCH_TIMEOUT_MS,
+      signal
     )
 
     if (!response.ok) {

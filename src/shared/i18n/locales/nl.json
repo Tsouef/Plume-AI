@@ -23,7 +23,13 @@
     "testConnectionError": "Verbinding mislukt",
     "save": "Instellingen opslaan",
     "saved": "Opgeslagen",
-    "showHide": "Tonen/verbergen"
+    "showHide": "Tonen/verbergen",
+    "checkMode": "Controlmodus",
+    "checkModeAuto": "Auto",
+    "checkModeManual": "Handmatig",
+    "currentSite": "Huidige site",
+    "enableSite": "Hier inschakelen",
+    "disableSite": "Uitschakelen"
   },
   "panel": {
     "panelLabel": "Grammatica-assistent",
@@ -35,7 +41,7 @@
     "looksGood": "Geen fouten",
     "issueCount_one": "{{count}} fout",
     "issueCount_other": "{{count}} fouten",
-    "improve": "✦ Verbeteren",
+    "polish": "✦ Verfijnen",
     "fixAll": "Alles corrigeren",
     "localMode": "Lokaal — geen data verzonden",
     "useThisVersion": "Deze versie gebruiken",

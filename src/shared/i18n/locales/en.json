@@ -23,7 +23,13 @@
     "testConnectionError": "Connection failed",
     "save": "Save settings",
     "saved": "Saved",
-    "showHide": "Show/hide"
+    "showHide": "Show/hide",
+    "checkMode": "Check mode",
+    "checkModeAuto": "Auto",
+    "checkModeManual": "Manual",
+    "currentSite": "Current site",
+    "enableSite": "Enable here",
+    "disableSite": "Disable"
   },
   "panel": {
     "panelLabel": "Grammar Assistant",
@@ -35,7 +41,7 @@
     "looksGood": "Looks good",
     "issueCount_one": "{{count}} issue",
     "issueCount_other": "{{count}} issues",
-    "improve": "✦ Improve",
+    "polish": "✦ Polish",
     "fixAll": "Fix all",
     "localMode": "Local — no data sent",
     "useThisVersion": "Use this version",
