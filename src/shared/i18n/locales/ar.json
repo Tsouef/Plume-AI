@@ -29,7 +29,9 @@
     "checkModeManual": "يدوي",
     "currentSite": "الموقع الحالي",
     "enableSite": "تفعيل هنا",
-    "disableSite": "تعطيل"
+    "disableSite": "تعطيل",
+    "siteNotEnabled": "الموقع غير مفعّل",
+    "siteEnabled": "الإضافة نشطة على هذا الموقع"
   },
   "panel": {
     "panelLabel": "Plume AI",

@@ -10,7 +10,9 @@
     "checkModeManual": "Manual",
     "currentSite": "Current site",
     "enableSite": "Enable here",
-    "disableSite": "Disable"
+    "disableSite": "Disable",
+    "siteNotEnabled": "Site not enabled",
+    "siteEnabled": "Extension active on this site"
   },
   "panel": {
     "toneOptions": "Rewrite tone"

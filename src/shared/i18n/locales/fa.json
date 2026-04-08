@@ -29,7 +29,9 @@
     "checkModeManual": "دستی",
     "currentSite": "سایت فعلی",
     "enableSite": "فعال‌سازی اینجا",
-    "disableSite": "غیرفعال کردن"
+    "disableSite": "غیرفعال کردن",
+    "siteNotEnabled": "سایت فعال نشده",
+    "siteEnabled": "افزونه در این سایت فعال است"
   },
   "panel": {
     "panelLabel": "Plume AI",

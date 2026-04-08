@@ -29,7 +29,9 @@
     "checkModeManual": "Manual",
     "currentSite": "Sitio actual",
     "enableSite": "Activar aquí",
-    "disableSite": "Desactivar"
+    "disableSite": "Desactivar",
+    "siteNotEnabled": "Sitio no activado",
+    "siteEnabled": "Extensión activa en este sitio"
   },
   "panel": {
     "panelLabel": "Plume AI",

@@ -29,7 +29,9 @@
     "checkModeManual": "手動",
     "currentSite": "現在のサイト",
     "enableSite": "ここで有効化",
-    "disableSite": "無効化"
+    "disableSite": "無効化",
+    "siteNotEnabled": "このサイトは有効化されていません",
+    "siteEnabled": "このサイトで拡張機能が有効です"
   },
   "panel": {
     "panelLabel": "Plume AI",

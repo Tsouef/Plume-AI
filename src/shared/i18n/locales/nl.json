@@ -29,7 +29,9 @@
     "checkModeManual": "Handmatig",
     "currentSite": "Huidige site",
     "enableSite": "Hier inschakelen",
-    "disableSite": "Uitschakelen"
+    "disableSite": "Uitschakelen",
+    "siteNotEnabled": "Site niet geactiveerd",
+    "siteEnabled": "Extensie actief op deze site"
   },
   "panel": {
     "panelLabel": "Plume AI",

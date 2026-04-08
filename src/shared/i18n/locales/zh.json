@@ -29,7 +29,9 @@
     "checkModeManual": "手动",
     "currentSite": "当前网站",
     "enableSite": "在此启用",
-    "disableSite": "禁用"
+    "disableSite": "禁用",
+    "siteNotEnabled": "未启用此网站",
+    "siteEnabled": "扩展在此网站处于活跃状态"
   },
   "panel": {
     "panelLabel": "Plume AI",
