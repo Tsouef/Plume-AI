@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1280" />
+    <title>Plume AI — Rewrite / Tone</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 1280px;
+        height: 800px;
+        overflow: hidden;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background: #0f0f14;
+      }
+
+      /* ── Browser chrome ── */
+      .browser-chrome {
+        height: 40px;
+        background: #1a1b23;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot-red {
+        background: #ff5f57;
+      }
+      .dot-yel {
+        background: #ffbd2e;
+      }
+      .dot-grn {
+        background: #28c840;
+      }
+      .url-bar {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+      }
+      .url-pill {
+        background: #0f0f14;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        padding: 4px 16px;
+        font-size: 11.5px;
+        color: #8b8d98;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
+
+      /* ── Page content ── */
+      .page-content {
+        height: calc(800px - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 0 40px;
+      }
+
+      /* ── Document editor ── */
+      .editor-area {
+        position: relative;
+        width: 560px;
+      }
+      .editor-label {
+        font-size: 10px;
+        color: #7c7e8a;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .editor-box {
+        background: #1a1b23;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 14px 16px;
+        min-height: 100px;
+        font-size: 13px;
+        color: #e8e9ed;
+        line-height: 1.8;
+      }
+      .trigger-btn {
+        position: absolute;
+        bottom: -16px;
+        right: -16px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00d4aa, #0ea5e9);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #0a0b10;
+        font-weight: 700;
+        box-shadow:
+          0 0 12px rgba(0, 212, 170, 0.45),
+          0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      /* ── Grammar Panel ── */
+      .panel {
+        position: relative;
+        width: 280px;
+        background: rgba(20, 21, 30, 0.92);
+        backdrop-filter: blur(24px) saturate(1.6);
+        -webkit-backdrop-filter: blur(24px) saturate(1.6);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 14px;
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.45),
+          0 2px 8px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        overflow: hidden;
+        font-size: 13px;
+        color: #e8e9ed;
+      }
+      .panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1.5px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          #00d4aa 30%,
+          #0ea5e9 70%,
+          transparent 100%
+        );
+        opacity: 0.75;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        background: rgba(10, 11, 16, 0.5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+      .status {
+        flex: 1;
+        font-weight: 500;
+        font-size: 12.5px;
+        color: #e8e9ed;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .status-icon {
+        font-size: 12px;
+        line-height: 1;
+        flex-shrink: 0;
+        color: #00d4aa;
+      }
+
+      .btn-polish {
+        padding: 4px 11px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #7c7e8a;
+        border: none;
+        border-radius: 6px;
+        cursor: default;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 600;
+        white-space: nowrap;
+        letter-spacing: -0.01em;
+      }
+
+      /* Tone pills bar */
+      .tone-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 7px 13px;
+        background: rgba(10, 11, 16, 0.3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .btn-tone {
+        padding: 3px 9px;
+        background: transparent;
+        color: #8b8d98;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 11px;
+        font-family: inherit;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+      }
+      .btn-tone.active {
+        border-color: #00d4aa;
+        color: #00d4aa;
+        background: rgba(0, 212, 170, 0.18);
+      }
+
+      /* AI result */
+      .ai-result {
+        padding: 11px 13px;
+        color: #e8e9ed;
+        font-style: italic;
+        background: rgba(14, 165, 233, 0.06);
+        border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+        font-size: 12.5px;
+        line-height: 1.6;
+      }
+
+      /* Actions */
+      .actions {
+        display: flex;
+        gap: 7px;
+        padding: 9px 13px;
+        background: rgba(10, 11, 16, 0.4);
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .btn-primary {
+        padding: 4px 12px;
+        background: linear-gradient(135deg, #00d4aa, #0ea5e9);
+        color: #0a0b10;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .btn-secondary {
+        padding: 4px 11px;
+        background: rgba(255, 255, 255, 0.04);
+        color: #8b8d98;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Browser chrome -->
+    <div class="browser-chrome">
+      <div class="dots">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yel"></div>
+        <div class="dot dot-grn"></div>
+      </div>
+      <div class="url-bar">
+        <div class="url-pill">https://docs.example.com/edit</div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+      <!-- Editor -->
+      <div class="editor-area">
+        <div class="editor-label">Document Editor</div>
+        <div class="editor-box">This meeting could maybe potentially be an email instead.</div>
+        <button class="trigger-btn">
+          <img
+            src="icon-48.png"
+            alt="Plume AI"
+            style="width: 26px; height: 26px; border-radius: 50%"
+          />
+        </button>
+      </div>
+
+      <!-- Panel -->
+      <div class="panel">
+        <!-- Header -->
+        <div class="header">
+          <div class="status">
+            <img
+              src="icon-48.png"
+              alt="Plume AI"
+              style="width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0"
+            />
+            Polish
+          </div>
+          <button class="btn-polish">
+            <img
+              src="icon-48.png"
+              alt="Plume AI"
+              style="
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                flex-shrink: 0;
+                margin-right: 4px;
+              "
+            />
+            Polish
+          </button>
+        </div>
+
+        <!-- Tone pills -->
+        <div class="tone-bar">
+          <button class="btn-tone active">shorter</button>
+          <button class="btn-tone">formal</button>
+          <button class="btn-tone">direct</button>
+          <button class="btn-tone">technical</button>
+        </div>
+
+        <!-- AI result -->
+        <div class="ai-result">"This meeting should be an email."</div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button class="btn-primary">✓ Accept</button>
+          <button class="btn-secondary">✕ Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

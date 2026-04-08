@@ -4,6 +4,11 @@
 
 # Plume AI
 
+<!-- Store badges (uncomment and replace IDs after publication):
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/EXTENSION_ID?label=Chrome%20Web%20Store)](https://chrome.google.com/webstore/detail/EXTENSION_ID)
+[![Firefox Add-on](https://img.shields.io/amo/v/plume-ai@tsouef.dev?label=Firefox%20Add-ons)](https://addons.mozilla.org/firefox/addon/plume-ai/)
+-->
+
 A browser extension (Chrome + Firefox) that brings AI-powered grammar checking, rewriting, and translation directly into any text field on the web — no copy-pasting, no context switching.
 
 Works with **Gemini, Claude, OpenAI, Mistral, and Ollama**. Pick the provider and model that fits your setup.
@@ -72,6 +77,11 @@ Built to WCAG 2.1 AA:
 ---
 
 ## Setup
+
+### Install from store
+
+- **Chrome**: Chrome Web Store link will be available after publication
+- **Firefox**: Firefox Add-ons link will be available after publication
 
 ### Chrome
 
@@ -250,6 +260,12 @@ src/
 | `npm run test:coverage` | Run unit tests with coverage     |
 | `npm run lint`          | ESLint (includes jsx-a11y rules) |
 | `npm run typecheck`     | TypeScript type check            |
+
+---
+
+## Privacy
+
+See the [Privacy Policy](PRIVACY.md) for full details. In brief: zero data collection — API keys stay in your browser, text goes directly to your chosen AI provider, and built-in PII anonymization strips emails and phone numbers before any AI call.
 
 ---
 

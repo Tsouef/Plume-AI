@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1280" />
+    <title>Plume AI — Grammar Panel</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 1280px;
+        height: 800px;
+        overflow: hidden;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background: #0f0f14;
+      }
+
+      /* ── Browser chrome ── */
+      .browser-chrome {
+        height: 40px;
+        background: #1a1b23;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot-red {
+        background: #ff5f57;
+      }
+      .dot-yel {
+        background: #ffbd2e;
+      }
+      .dot-grn {
+        background: #28c840;
+      }
+
+      .url-bar {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+      }
+      .url-pill {
+        background: #0f0f14;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        padding: 4px 16px;
+        font-size: 11.5px;
+        color: #8b8d98;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
+
+      /* ── Page content ── */
+      .page-content {
+        height: calc(800px - 40px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        position: relative;
+        padding: 0 40px;
+      }
+
+      /* ── Document editor area ── */
+      .editor-area {
+        position: relative;
+        width: 560px;
+      }
+      .editor-box {
+        background: #1a1b23;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 14px 16px;
+        min-height: 100px;
+        font-size: 13px;
+        color: #e8e9ed;
+        line-height: 1.8;
+        word-break: break-word;
+      }
+      .editor-label {
+        font-size: 10px;
+        color: #7c7e8a;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      mark.error-highlight {
+        background: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+        border-bottom: 1.5px solid #f59e0b;
+        border-radius: 2px;
+        padding: 1px 3px;
+      }
+
+      /* Trigger button */
+      .trigger-btn {
+        position: absolute;
+        bottom: -16px;
+        right: -16px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00d4aa, #0ea5e9);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #0a0b10;
+        box-shadow:
+          0 0 12px rgba(0, 212, 170, 0.45),
+          0 2px 8px rgba(0, 0, 0, 0.4);
+        font-weight: 700;
+      }
+
+      /* ── Grammar Panel ── */
+      .panel-wrap {
+        /* background behind panel so glassmorphism reads */
+        background: rgba(15, 16, 22, 0.7);
+        border-radius: 14px;
+        padding: 0;
+      }
+
+      .panel {
+        position: relative;
+        width: 280px;
+        background: rgba(20, 21, 30, 0.92);
+        backdrop-filter: blur(24px) saturate(1.6);
+        -webkit-backdrop-filter: blur(24px) saturate(1.6);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 14px;
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.45),
+          0 2px 8px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        overflow: hidden;
+        font-size: 13px;
+        color: #e8e9ed;
+      }
+
+      /* Gradient accent line */
+      .panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1.5px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          #00d4aa 30%,
+          #0ea5e9 70%,
+          transparent 100%
+        );
+        opacity: 0.75;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        background: rgba(10, 11, 16, 0.5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+      .status {
+        flex: 1;
+        font-weight: 500;
+        font-size: 12.5px;
+        color: #e8e9ed;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .status-icon {
+        font-size: 12px;
+        line-height: 1;
+        flex-shrink: 0;
+        color: #f59e0b;
+      }
+      .btn-polish {
+        padding: 4px 11px;
+        background: linear-gradient(135deg, #00d4aa, #0ea5e9);
+        color: #0a0b10;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 600;
+        white-space: nowrap;
+        letter-spacing: -0.01em;
+      }
+
+      /* Text preview */
+      .text-preview {
+        font-size: 12.5px;
+        color: #8b8d98;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .text-body {
+        padding: 10px 13px;
+        line-height: 1.8;
+        word-break: break-word;
+      }
+      .error-annotation {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #00d4aa;
+        padding: 1px 5px;
+        border-radius: 3px;
+        background: rgba(0, 212, 170, 0.1);
+        margin-left: 1px;
+        white-space: nowrap;
+      }
+
+      /* Error list */
+      .error-list {
+        list-style: none;
+        margin: 0;
+        padding: 8px 13px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .error-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 11.5px;
+        line-height: 1.5;
+        padding-bottom: 6px;
+      }
+      .error-item:not(:last-child) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        margin-bottom: 4px;
+      }
+      .error-item-header {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+      }
+      .error-item-header::before {
+        content: '';
+        display: inline-block;
+        flex-shrink: 0;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #f59e0b;
+        opacity: 0.75;
+        align-self: center;
+      }
+      .error-item-word {
+        color: #f59e0b;
+        font-weight: 500;
+        opacity: 0.85;
+      }
+      .error-item-arrow {
+        color: #7c7e8a;
+        font-size: 10px;
+      }
+      .error-item-fix {
+        color: #00d4aa;
+        font-weight: 600;
+      }
+      .error-item-reason {
+        color: #7c7e8a;
+        font-size: 11px;
+        line-height: 1.5;
+        margin: 0;
+        padding-left: 10px;
+      }
+
+      /* Actions */
+      .actions {
+        display: flex;
+        gap: 7px;
+        padding: 9px 13px;
+        background: rgba(10, 11, 16, 0.4);
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .btn-primary {
+        padding: 4px 12px;
+        background: linear-gradient(135deg, #00d4aa, #0ea5e9);
+        color: #0a0b10;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Browser chrome -->
+    <div class="browser-chrome">
+      <div class="dots">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yel"></div>
+        <div class="dot dot-grn"></div>
+      </div>
+      <div class="url-bar">
+        <div class="url-pill">https://docs.example.com/edit</div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+      <!-- Editor -->
+      <div class="editor-area">
+        <div class="editor-label">Document Editor</div>
+        <div class="editor-box">
+          I <mark class="error-highlight">have went</mark> to the store
+          <mark class="error-highlight">yestarday</mark> and
+          <mark class="error-highlight">buyed</mark> some milk.
+        </div>
+        <button class="trigger-btn">
+          <img
+            src="icon-48.png"
+            alt="Plume AI"
+            style="width: 26px; height: 26px; border-radius: 50%"
+          />
+        </button>
+      </div>
+
+      <!-- Grammar Panel -->
+      <div class="panel">
+        <!-- Header -->
+        <div class="header">
+          <div class="status">
+            <img
+              src="icon-48.png"
+              alt="Plume AI"
+              style="width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0"
+            />
+            3 issues found
+          </div>
+          <button class="btn-polish">
+            <img
+              src="icon-48.png"
+              alt="Plume AI"
+              style="
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                flex-shrink: 0;
+                margin-right: 4px;
+              "
+            />
+            Polish
+          </button>
+        </div>
+
+        <!-- Text preview -->
+        <div class="text-preview">
+          <div class="text-body">
+            I <mark class="error-highlight">have went</mark
+            ><span class="error-annotation">have gone</span>
+            to the store
+            <mark class="error-highlight">yestarday</mark
+            ><span class="error-annotation">yesterday</span> and
+            <mark class="error-highlight">buyed</mark><span class="error-annotation">bought</span>
+            some milk.
+          </div>
+        </div>
+
+        <!-- Error list -->
+        <ul class="error-list">
+          <li class="error-item">
+            <div class="error-item-header">
+              <span class="error-item-word">have went</span>
+              <span class="error-item-arrow">→</span>
+              <span class="error-item-fix">have gone</span>
+            </div>
+            <p class="error-item-reason">Incorrect verb form — use past participle with 'have'</p>
+          </li>
+          <li class="error-item">
+            <div class="error-item-header">
+              <span class="error-item-word">yestarday</span>
+              <span class="error-item-arrow">→</span>
+              <span class="error-item-fix">yesterday</span>
+            </div>
+            <p class="error-item-reason">Spelling error</p>
+          </li>
+          <li class="error-item">
+            <div class="error-item-header">
+              <span class="error-item-word">buyed</span>
+              <span class="error-item-arrow">→</span>
+              <span class="error-item-fix">bought</span>
+            </div>
+            <p class="error-item-reason">Irregular past tense</p>
+          </li>
+        </ul>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button class="btn-primary">Fix all (3)</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

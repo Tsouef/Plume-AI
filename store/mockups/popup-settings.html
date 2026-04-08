@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1280" />
+    <title>Plume AI — Popup Settings</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 1280px;
+        height: 800px;
+        overflow: hidden;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background: #0f0f14;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      /* Subtle grid texture */
+      body::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+      }
+
+      /* Glow behind popup */
+      .popup-glow {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(ellipse at center, rgba(0, 212, 170, 0.07) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      /* ── Popup ── */
+      .popup {
+        position: relative;
+        z-index: 1;
+        width: 300px;
+        background: #0f0f14;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 10px;
+        padding: 16px 18px 18px;
+        font-size: 13px;
+        color: #e8e9ed;
+        box-shadow:
+          0 16px 48px rgba(0, 0, 0, 0.6),
+          0 4px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      /* Heading */
+      .heading {
+        font-size: 14.5px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #e8e9ed;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding-bottom: 13px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        position: relative;
+      }
+      .heading::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, #00d4aa, #0ea5e9);
+        opacity: 0.8;
+      }
+      .logo-icon {
+        display: inline-flex;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        border-radius: 4px;
+        object-fit: contain;
+      }
+
+      /* Sections */
+      .section {
+        margin-bottom: 16px;
+      }
+      .section:last-child {
+        margin-bottom: 0;
+      }
+
+      .label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        color: #7c7e8a;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 7px;
+      }
+
+      select,
+      input[type='text'],
+      input[type='password'] {
+        width: 100%;
+        padding: 7px 10px;
+        background: #12131a;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-family: inherit;
+        color: #e8e9ed;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      /* Field */
+      .field {
+        margin-top: 10px;
+      }
+
+      /* Input row with test button */
+      .input-row {
+        display: flex;
+        gap: 7px;
+      }
+      .input-row input {
+        flex: 1;
+      }
+
+      .test-btn {
+        flex-shrink: 0;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        padding: 0 10px;
+        height: 30px;
+        border-radius: 6px;
+        border: 1px solid #00d4aa;
+        background: transparent;
+        color: #00d4aa;
+        cursor: pointer;
+        white-space: nowrap;
+        font-family: inherit;
+      }
+
+      /* Test result */
+      .test-result {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 6px;
+        padding: 4px 8px;
+        border-radius: 5px;
+        color: #00d4aa;
+        background: rgba(0, 212, 170, 0.12);
+        border: 1px solid rgba(0, 212, 170, 0.3);
+      }
+
+      /* Theme group */
+      .theme-group {
+        display: flex;
+        background: #12131a;
+        border-radius: 10px;
+        padding: 2px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        gap: 2px;
+      }
+      .theme-btn {
+        flex: 1;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #7c7e8a;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        letter-spacing: 0.01em;
+      }
+      .theme-btn.active {
+        background: #1a1b23;
+        color: #e8e9ed;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Manual mode */
+      .mode-group {
+        display: flex;
+        background: #12131a;
+        border-radius: 10px;
+        padding: 2px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        gap: 2px;
+      }
+      .mode-btn {
+        flex: 1;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #7c7e8a;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        letter-spacing: 0.01em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popup-glow"></div>
+
+    <div class="popup">
+      <!-- Heading -->
+      <div class="heading">
+        <img
+          class="logo-icon"
+          src="icon-48.png"
+          alt="Plume AI"
+          style="width: 20px; height: 20px; border-radius: 4px"
+        />
+        Plume AI
+      </div>
+
+      <!-- Provider section -->
+      <div class="section">
+        <label class="label">Provider</label>
+        <select>
+          <option selected>Google Gemini</option>
+          <option>OpenAI</option>
+          <option>Anthropic</option>
+        </select>
+
+        <div class="field">
+          <label class="label">Model</label>
+          <select>
+            <option selected>gemini-2.5-flash-lite</option>
+            <option>gemini-2.5-pro</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="label">API Key</label>
+          <div class="input-row">
+            <input type="password" value="AIzaSyDexamplekeyhere1234" />
+            <button class="test-btn">Test</button>
+          </div>
+          <div class="test-result">✓ Connection successful</div>
+        </div>
+      </div>
+
+      <!-- Language section -->
+      <div class="section">
+        <label class="label">Language</label>
+        <select>
+          <option selected>English (US)</option>
+          <option>English (UK)</option>
+          <option>French</option>
+          <option>Spanish</option>
+        </select>
+      </div>
+
+      <!-- Theme section -->
+      <div class="section">
+        <label class="label">Theme</label>
+        <div class="theme-group">
+          <button class="theme-btn">☀ Light</button>
+          <button class="theme-btn active">◑ Dark</button>
+          <button class="theme-btn">⊙ System</button>
+        </div>
+      </div>
+
+      <!-- Manual Mode section -->
+      <div class="section">
+        <label class="label">Manual Mode</label>
+        <div class="mode-group">
+          <button class="mode-btn">Off</button>
+          <button class="mode-btn">On</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
