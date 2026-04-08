@@ -90,6 +90,20 @@ export function usePanelOrchestration(config: Config) {
 
   const closePanelRef = useLatestRef(closePanel)
 
+  // Auto-retry grammar check if config changes while showing NO_PROVIDER_CONFIGURED
+  const prevConfigRef = useRef(config)
+  useEffect(() => {
+    if (config === prevConfigRef.current) return
+    prevConfigRef.current = config
+    if (!isPanelOpen) return
+    if (panelState.state.type !== 'error') return
+    if (panelState.state.message !== 'NO_PROVIDER_CONFIGURED') return
+    const field = panelFieldRef.current
+    if (!field) return
+    panelState.setChecking()
+    grammarCheck(getFieldText(field), true)
+  }, [config, isPanelOpen, panelState, grammarCheck])
+
   // Close panel when field loses focus (focus genuinely left both field and panel)
   useEffect(() => {
     if (!isPanelOpen) return

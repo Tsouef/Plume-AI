@@ -2,11 +2,12 @@ import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 
 // vi.hoisted runs before any module is evaluated, allowing us to stub chrome
 // before index.ts registers chrome.runtime.onMessage.addListener at module load time.
-const { captureOnUpdated } = vi.hoisted(() => {
+const { captureOnUpdated, captureOnCommand } = vi.hoisted(() => {
   const onUpdatedAddListener = vi.fn()
+  const onCommandAddListener = vi.fn()
   vi.stubGlobal('chrome', {
     commands: {
-      onCommand: { addListener: vi.fn() },
+      onCommand: { addListener: onCommandAddListener },
     },
     tabs: {
       onUpdated: { addListener: onUpdatedAddListener },
@@ -16,7 +17,7 @@ const { captureOnUpdated } = vi.hoisted(() => {
       onMessage: { addListener: vi.fn() },
     },
   })
-  return { captureOnUpdated: onUpdatedAddListener }
+  return { captureOnUpdated: onUpdatedAddListener, captureOnCommand: onCommandAddListener }
 })
 
 import { handleMessage } from './index'
@@ -53,16 +54,7 @@ function makeProvider() {
 
 beforeEach(() => {
   vi.stubGlobal('chrome', { runtime: { id: 'test-ext' } })
-  mockGetConfig.mockResolvedValue({
-    provider: 'claude',
-    apiKey: 'key',
-    model: 'claude-haiku-4-5-20251001',
-    language: 'en',
-    uiLanguage: 'en',
-    theme: 'dark',
-    disabledSites: [],
-    ollamaBaseUrl: '',
-  } as never)
+  mockGetConfig.mockResolvedValue(DEFAULT_CONFIG)
   mockGetProvider.mockReset()
   mockFetchModels.mockReset()
   vi.mocked(createProvider).mockReset()
@@ -294,6 +286,53 @@ describe('tabs.onUpdated — trusted domain auto-inject', () => {
     } as never)
 
     await onUpdatedHandler(42, { status: 'complete' }, { url: 'chrome://newtab/' })
+
+    expect(execScript).not.toHaveBeenCalled()
+  })
+})
+
+describe('commands.onCommand — open-panel keyboard shortcut', () => {
+  let onCommandHandler: (command: string) => Promise<void>
+
+  beforeAll(() => {
+    onCommandHandler = captureOnCommand.mock.calls[0][0]
+  })
+
+  it('does not send message or inject when domain is not trusted', async () => {
+    const execScript = vi.fn()
+    const sendMessage = vi.fn()
+    vi.stubGlobal('chrome', {
+      scripting: { executeScript: execScript },
+      tabs: {
+        query: vi.fn().mockResolvedValue([{ id: 42, url: 'https://untrusted.com/page' }]),
+        sendMessage,
+      },
+      runtime: { id: 'test-ext' },
+    })
+    mockGetConfig.mockResolvedValue({ ...DEFAULT_CONFIG, trustedDomains: [] } as never)
+
+    await onCommandHandler('open-panel')
+
+    expect(sendMessage).not.toHaveBeenCalled()
+    expect(execScript).not.toHaveBeenCalled()
+  })
+
+  it('ignores non open-panel commands', async () => {
+    const execScript = vi.fn()
+    vi.stubGlobal('chrome', {
+      scripting: { executeScript: execScript },
+      tabs: {
+        query: vi.fn().mockResolvedValue([{ id: 42, url: 'https://example.com/' }]),
+        sendMessage: vi.fn(),
+      },
+      runtime: { id: 'test-ext' },
+    })
+    mockGetConfig.mockResolvedValue({
+      ...DEFAULT_CONFIG,
+      trustedDomains: ['example.com'],
+    } as never)
+
+    await onCommandHandler('some-other-command')
 
     expect(execScript).not.toHaveBeenCalled()
   })

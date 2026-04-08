@@ -10,7 +10,6 @@ describe('mergeConfig', () => {
     const result = mergeConfig({ language: 'fr-FR' })
     expect(result.language).toBe('fr-FR')
     expect(result.activeProvider).toBe(DEFAULT_CONFIG.activeProvider)
-    expect(result.disabledDomains).toEqual([])
   })
 
   it('overrides providers array', () => {
@@ -31,6 +30,5 @@ describe('mergeConfig', () => {
     const result = mergeConfig({ providers: [{ id: 'gemini', apiKey: 'xyz' }], language: 'fr-FR' })
     expect(result.providers[0].apiKey).toBe('xyz')
     expect(result.language).toBe('fr-FR')
-    expect(result.disabledDomains).toEqual([])
   })
 })

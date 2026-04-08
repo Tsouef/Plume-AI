@@ -16,8 +16,6 @@
     "themeDark": "ダーク",
     "themeLight": "ライト",
     "autoDetect": "自動検出",
-    "disabledSites": "無効なサイト",
-    "addBtn": "+ 追加",
     "testConnection": "テスト",
     "testConnectionOk": "接続OK",
     "testConnectionError": "接続失敗",

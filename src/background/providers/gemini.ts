@@ -6,7 +6,7 @@ const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
 export class GeminiProvider extends BaseProvider {
   constructor(
     private readonly apiKey: string,
-    private readonly model: string = 'gemini-2.0-flash-lite'
+    private readonly model: string = 'gemini-2.5-flash-lite'
   ) {
     super()
   }

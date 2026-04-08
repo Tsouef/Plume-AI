@@ -4,7 +4,7 @@ import type { Config } from './types'
 
 export const STORAGE_KEY = 'config'
 
-const FLAT_KEYS = ['activeProvider', 'providers', 'language', 'disabledDomains'] as const
+const FLAT_KEYS = ['activeProvider', 'providers', 'language'] as const
 
 export async function getConfig(): Promise<Config> {
   if (!isExtensionValid()) {

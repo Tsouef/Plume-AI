@@ -42,7 +42,6 @@ export interface Config {
     | 'pt-BR'
   uiLanguage: UiLocale
   uiTheme: UiTheme
-  disabledDomains: string[]
   manualOnly: boolean
   trustedDomains: string[]
 }

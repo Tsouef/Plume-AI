@@ -7,18 +7,28 @@
   color: var(--text-primary);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 7px;
   padding-bottom: 13px;
   margin-bottom: 16px;
   border-bottom: 1px solid var(--border-primary);
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-primary);
+  margin-left: -18px;
+  margin-right: -18px;
+  margin-top: -16px;
+  padding-left: 18px;
+  padding-right: 18px;
+  padding-top: 16px;
 }
 
 .heading::after {
   content: '';
   position: absolute;
   bottom: -1px;
-  left: 0;
+  left: 18px;
   width: 60px;
   height: 1px;
   background: linear-gradient(90deg, var(--accent), var(--accent-blue));
@@ -32,4 +42,29 @@
   flex-shrink: 0;
   border-radius: 4px;
   object-fit: contain;
+}
+
+.headingLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.btnSaveHeader {
+  padding: 4px 11px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-blue) 100%);
+  color: #0a0b10;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: filter 150ms ease;
+  flex-shrink: 0;
+}
+
+.btnSaveHeader:hover {
+  filter: brightness(1.1);
 }

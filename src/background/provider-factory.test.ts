@@ -19,7 +19,6 @@ const base: Config = {
   language: 'auto',
   uiLanguage: 'en',
   uiTheme: 'dark',
-  disabledDomains: [],
   manualOnly: false,
   trustedDomains: [],
 }

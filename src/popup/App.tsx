@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useConfig } from './hooks/useConfig'
 import type { Config, ProviderId, UiLocale, UiTheme } from '../shared/types'
 import { EASE_OUT, SAVED_VISIBLE_DURATION_MS } from '../shared/constants'
-import { PROVIDER_IDS } from '../shared/models'
+import { PROVIDER_IDS, PROVIDER_MODELS } from '../shared/models'
 import i18n, { RTL_LOCALES } from '../shared/i18n/i18n'
 import styles from './App.module.css'
 import { ProviderSection } from './components/ProviderSection/ProviderSection'
@@ -13,10 +13,7 @@ import { LanguageSection } from './components/LanguageSection/LanguageSection'
 import { UiLanguageSection } from './components/UiLanguageSection/UiLanguageSection'
 import { ThemeSection } from './components/ThemeSection/ThemeSection'
 import { ManualModeSection } from './components/ManualModeSection/ManualModeSection'
-import { DisabledSitesSection } from './components/DisabledSitesSection/DisabledSitesSection'
 import { SitePermissionSection } from './components/SitePermissionSection/SitePermissionSection'
-import { SaveButton } from './components/SaveButton/SaveButton'
-import { SavedMessage } from './components/SavedMessage/SavedMessage'
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 8 },
@@ -49,9 +46,11 @@ function initialPerProviderState(config: Config): Record<ProviderId, PerProvider
   const result = {} as Record<ProviderId, PerProviderState>
   for (const id of PROVIDER_IDS) {
     const stored = config.providers.find((p) => p.id === id)
+    const defaultModel =
+      id !== 'ollama' ? PROVIDER_MODELS[id as Exclude<ProviderId, 'ollama'>][0] : ''
     result[id] = {
       apiKey: stored?.apiKey ?? '',
-      model: stored?.model ?? '',
+      model: stored?.model || defaultModel,
       baseUrl: stored?.baseUrl ?? (id === 'ollama' ? 'http://localhost:11434' : ''),
     }
   }
@@ -68,7 +67,6 @@ function AppForm({ config, saveConfig }: AppFormProps) {
   const [uiLanguage, setUiLanguage] = useState<UiLocale>(config.uiLanguage)
   const [uiTheme, setUiTheme] = useState<UiTheme>(config.uiTheme ?? 'dark')
   const [manualOnly, setManualOnly] = useState(config.manualOnly ?? false)
-  const [domains, setDomains] = useState([...config.disabledDomains])
   const [trustedDomains, setTrustedDomains] = useState([...config.trustedDomains])
   const [errors, setErrors] = useState<{ apiKey?: boolean; baseUrl?: boolean; model?: boolean }>({})
   const [savedVisible, setSavedVisible] = useState(false)
@@ -126,18 +124,6 @@ function AppForm({ config, saveConfig }: AppFormProps) {
   function handleUiThemeChange(theme: UiTheme) {
     setUiTheme(theme)
     document.body.dataset.theme = theme
-  }
-
-  function handleAddDomain(domain: string) {
-    const newDomains = [...domains, domain]
-    setDomains(newDomains)
-    saveConfig({ ...config, disabledDomains: newDomains })
-  }
-
-  function handleRemoveDomain(domain: string) {
-    const newDomains = domains.filter((d) => d !== domain)
-    setDomains(newDomains)
-    saveConfig({ ...config, disabledDomains: newDomains })
   }
 
   async function handleGrantDomain(domain: string) {
@@ -213,7 +199,6 @@ function AppForm({ config, saveConfig }: AppFormProps) {
       language,
       uiLanguage,
       uiTheme,
-      disabledDomains: domains,
       manualOnly,
       trustedDomains,
     }
@@ -226,10 +211,27 @@ function AppForm({ config, saveConfig }: AppFormProps) {
   return (
     <MotionConfig reducedMotion="user">
       <h1 className={styles.heading}>
-        <img src="/icons/icon-16.png" alt="" className={styles.logoIcon} width={16} height={16} />
-        {t('popup.heading')}
+        <div className={styles.headingLeft}>
+          <img src="/icons/icon-16.png" alt="" className={styles.logoIcon} width={16} height={16} />
+          {t('popup.heading')}
+        </div>
+        <motion.button
+          className={styles.btnSaveHeader}
+          onClick={handleSave}
+          whileTap={{ scale: 0.96 }}
+          aria-label={t('popup.save')}
+        >
+          {savedVisible ? `✓ ${t('popup.saved')}` : t('popup.save')}
+        </motion.button>
       </h1>
       <motion.div variants={containerVariants} initial="hidden" animate="visible">
+        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
+          <SitePermissionSection
+            trustedDomains={trustedDomains}
+            onGrant={handleGrantDomain}
+            onRevoke={handleRevokeDomain}
+          />
+        </motion.div>
         <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
           <ProviderSection
             activeProvider={activeProvider}
@@ -252,24 +254,6 @@ function AppForm({ config, saveConfig }: AppFormProps) {
         </motion.div>
         <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
           <ThemeSection value={uiTheme} onChange={handleUiThemeChange} />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <DisabledSitesSection
-            domains={domains}
-            onAdd={handleAddDomain}
-            onRemove={handleRemoveDomain}
-          />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <SitePermissionSection
-            trustedDomains={trustedDomains}
-            onGrant={handleGrantDomain}
-            onRevoke={handleRevokeDomain}
-          />
-        </motion.div>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.3, ease: EASE_OUT }}>
-          <SaveButton onClick={handleSave} />
-          <SavedMessage visible={savedVisible} />
         </motion.div>
       </motion.div>
     </MotionConfig>

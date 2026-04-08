@@ -16,8 +16,6 @@
     "themeDark": "داكن",
     "themeLight": "فاتح",
     "autoDetect": "اكتشاف تلقائي",
-    "disabledSites": "المواقع المعطّلة",
-    "addBtn": "+ إضافة",
     "testConnection": "اختبار",
     "testConnectionOk": "الاتصال ناجح",
     "testConnectionError": "فشل الاتصال",

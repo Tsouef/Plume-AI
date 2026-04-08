@@ -1,55 +1,101 @@
-/* ─── SitePermissionSection ──────────────────────────────────────────────── */
-
-.row {
+/* ── shared banner shell ── */
+.bannerInactive,
+.bannerActive {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+/* not-enabled state: teal tint */
+.bannerInactive {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* active state: neutral */
+.bannerActive {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+/* ── icon column ── */
+.icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+/* ── text column ── */
+.text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .domain {
-  font-size: 12.5px;
+  font-size: 11px;
   color: var(--text-secondary);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
 }
 
+/* ── buttons ── */
 .grantBtn {
-  padding: 5px 11px;
-  background: var(--accent-glow);
-  border: 1px solid var(--border-accent);
+  padding: 5px 10px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-blue) 100%);
+  border: none;
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 12px;
-  font-family: inherit;
-  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0a0b10;
   white-space: nowrap;
-  transition:
-    border-color 150ms ease,
-    background 150ms ease;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: filter 150ms ease;
 }
 
 .grantBtn:hover {
-  background: var(--accent-glow);
-  border-color: var(--accent);
+  filter: brightness(1.1);
 }
 
 .revokeBtn {
-  padding: 5px 11px;
+  padding: 5px 10px;
   background: var(--btn-ghost-bg);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 12px;
-  font-family: inherit;
+  font-size: 11.5px;
   color: var(--text-muted);
   white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
   transition:
     border-color 150ms ease,
-    color 150ms ease,
-    background 150ms ease;
+    color 150ms ease;
 }
 
 .revokeBtn:hover {

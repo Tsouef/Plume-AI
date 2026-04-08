@@ -16,8 +16,6 @@
     "themeDark": "Dark",
     "themeLight": "Light",
     "autoDetect": "Auto-detect",
-    "disabledSites": "Disabled Sites",
-    "addBtn": "+ Add",
     "testConnection": "Test",
     "testConnectionOk": "Connection OK",
     "testConnectionError": "Connection failed",

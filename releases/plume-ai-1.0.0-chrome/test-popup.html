@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grammar Assistant — QA Test</title>
+    <script>
+      // Chrome Extension API mock — must run before app modules load
+      window.chrome = {
+        storage: {
+          local: {
+            _data: {},
+            get: function (keys, callback) {
+              const result = {}
+              if (typeof keys === 'object' && !Array.isArray(keys) && keys !== null) {
+                Object.keys(keys).forEach((k) => {
+                  result[k] = this._data[k] !== undefined ? this._data[k] : keys[k]
+                })
+              } else if (Array.isArray(keys)) {
+                keys.forEach((k) => {
+                  if (this._data[k] !== undefined) result[k] = this._data[k]
+                })
+              } else if (typeof keys === 'string') {
+                if (this._data[keys] !== undefined) result[keys] = this._data[keys]
+              }
+              if (callback) callback(result)
+              return Promise.resolve(result)
+            },
+            set: function (items, callback) {
+              Object.assign(this._data, items)
+              if (callback) callback()
+              return Promise.resolve()
+            },
+            remove: function (keys, callback) {
+              ;(Array.isArray(keys) ? keys : [keys]).forEach((k) => delete this._data[k])
+              if (callback) callback()
+              return Promise.resolve()
+            },
+          },
+          sync: {
+            get: function (keys, callback) {
+              if (callback) callback({})
+              return Promise.resolve({})
+            },
+            set: function (items, callback) {
+              if (callback) callback()
+              return Promise.resolve()
+            },
+          },
+          onChanged: {
+            addListener: function () {},
+            removeListener: function () {},
+          },
+        },
+        runtime: {
+          sendMessage: function (msg, callback) {
+            // Return appropriate mock responses per message type
+            const response =
+              msg && msg.type === 'GET_OLLAMA_MODELS'
+                ? { models: ['llama3.2', 'mistral', 'phi3'] }
+                : {}
+            if (callback) callback(response)
+            return Promise.resolve(response)
+          },
+          onMessage: {
+            addListener: function () {},
+            removeListener: function () {},
+          },
+          lastError: null,
+          id: 'test-extension-id',
+        },
+      }
+    </script>
+    <script type="module" crossorigin src="/src/popup/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/index.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

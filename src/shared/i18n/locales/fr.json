@@ -16,8 +16,6 @@
     "themeDark": "Sombre",
     "themeLight": "Clair",
     "autoDetect": "Détection automatique",
-    "disabledSites": "Sites désactivés",
-    "addBtn": "+ Ajouter",
     "testConnection": "Tester",
     "testConnectionOk": "Connexion OK",
     "testConnectionError": "Connexion échouée",

@@ -8,7 +8,20 @@ let currentGrammarAbort: AbortController | null = null
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== 'open-panel') return
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
-  if (!tab?.id) return
+  if (!tab?.id || !tab.url) return
+
+  let hostname: string
+  try {
+    const parsed = new URL(tab.url)
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return
+    hostname = parsed.hostname
+  } catch {
+    return
+  }
+
+  const config = await getConfig()
+  if (!config.trustedDomains.includes(hostname)) return
+
   try {
     await chrome.tabs.sendMessage(tab.id, { type: 'OPEN_PANEL' })
   } catch {
@@ -73,6 +86,25 @@ export async function handleMessage(message: BackgroundMessage): Promise<Backgro
     }
   }
 
+  if (message.type === 'TEST_CONNECTION') {
+    const provider = createProvider(
+      message.providerId,
+      message.apiKey,
+      message.model,
+      message.baseUrl
+    )
+    try {
+      const result = await Promise.race([
+        provider.translate('Hello', 'en'),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out')), 10_000)),
+      ])
+      if (!result) return { ok: false, error: 'Empty response' }
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : 'Connection failed' }
+    }
+  }
+
   const config = await getConfig()
   const provider = getActiveProvider(config)
 
@@ -107,24 +139,6 @@ export async function handleMessage(message: BackgroundMessage): Promise<Backgro
   if (message.type === 'TRANSLATE') {
     const translated = await provider.translate(message.text, message.targetLanguage)
     return { translated }
-  }
-  if (message.type === 'TEST_CONNECTION') {
-    const provider = createProvider(
-      message.providerId,
-      message.apiKey,
-      message.model,
-      message.baseUrl
-    )
-    try {
-      const result = await Promise.race([
-        provider.translate('Hello', 'en'),
-        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out')), 10_000)),
-      ])
-      if (!result) return { ok: false, error: 'Empty response' }
-      return { ok: true }
-    } catch (err) {
-      return { ok: false, error: err instanceof Error ? err.message : 'Connection failed' }
-    }
   }
   throw new Error('Unknown message type')
 }

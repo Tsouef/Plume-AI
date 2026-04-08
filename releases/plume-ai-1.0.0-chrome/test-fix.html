@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grammar Assistant — Fix Verify</title>
+    <script>
+      window.chrome = {
+        storage: {
+          local: {
+            _data: {},
+            get: function (keys, callback) {
+              const result = {}
+              if (typeof keys === 'object' && !Array.isArray(keys) && keys !== null) {
+                Object.keys(keys).forEach((k) => {
+                  result[k] = this._data[k] !== undefined ? this._data[k] : keys[k]
+                })
+              }
+              if (callback) callback(result)
+              return Promise.resolve(result)
+            },
+            set: function (items, callback) {
+              Object.assign(this._data, items)
+              if (callback) callback()
+              return Promise.resolve()
+            },
+            remove: function (keys, callback) {
+              if (callback) callback()
+              return Promise.resolve()
+            },
+          },
+          sync: {
+            get: function (keys, callback) {
+              if (callback) callback({})
+              return Promise.resolve({})
+            },
+            set: function (items, callback) {
+              if (callback) callback()
+              return Promise.resolve()
+            },
+          },
+          onChanged: { addListener: function () {}, removeListener: function () {} },
+        },
+        runtime: {
+          // Intentionally return {} (no models field) to test null guard
+          sendMessage: function (msg, callback) {
+            if (callback) callback({})
+            return Promise.resolve({})
+          },
+          onMessage: { addListener: function () {}, removeListener: function () {} },
+          lastError: null,
+          id: 'test-extension-id',
+        },
+      }
+    </script>
+    <script type="module" crossorigin src="/src/popup/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/index.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

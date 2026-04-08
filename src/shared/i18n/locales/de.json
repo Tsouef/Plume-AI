@@ -16,8 +16,6 @@
     "themeDark": "Dunkel",
     "themeLight": "Hell",
     "autoDetect": "Automatisch erkennen",
-    "disabledSites": "Deaktivierte Websites",
-    "addBtn": "+ Hinzufügen",
     "testConnection": "Testen",
     "testConnectionOk": "Verbindung OK",
     "testConnectionError": "Verbindung fehlgeschlagen",

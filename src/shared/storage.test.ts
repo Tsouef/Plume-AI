@@ -25,7 +25,6 @@ describe('getConfig — namespaced key', () => {
       activeProvider: 'claude',
       providers: [{ id: 'claude', apiKey: 'sk-test' }],
       language: 'fr-FR',
-      disabledDomains: [],
     }
     mockStorage.get.mockResolvedValue({ [STORAGE_KEY]: stored })
     const config = await getConfig()
@@ -48,7 +47,6 @@ describe('getConfig — migration from flat keys', () => {
       activeProvider: 'claude',
       providers: [{ id: 'claude', apiKey: 'sk-ant' }],
       language: 'auto',
-      disabledDomains: [],
     }
     mockStorage.get
       .mockResolvedValueOnce({}) // get(STORAGE_KEY) → absent
@@ -61,11 +59,11 @@ describe('getConfig — migration from flat keys', () => {
   })
 
   it('removes stale flat keys after migration', async () => {
-    const flat = { activeProvider: 'claude', providers: [], language: 'auto', disabledDomains: [] }
+    const flat = { activeProvider: 'claude', providers: [], language: 'auto' }
     mockStorage.get.mockResolvedValueOnce({}).mockResolvedValueOnce(flat)
     await getConfig()
     expect(mockStorage.remove).toHaveBeenCalledWith(
-      expect.arrayContaining(['activeProvider', 'providers', 'language', 'disabledDomains'])
+      expect.arrayContaining(['activeProvider', 'providers', 'language'])
     )
   })
 

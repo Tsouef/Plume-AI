@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Plume AI",
+  "version": "1.0.0",
+  "description": "On-demand grammar checking and AI rewriting for any web text field",
+  "permissions": ["storage", "scripting", "activeTab", "tabs"],
+  "optional_host_permissions": ["<all_urls>"],
+  "commands": {
+    "open-panel": {
+      "suggested_key": { "mac": "MacCtrl+Shift+G", "default": "Ctrl+Shift+G" },
+      "description": "Open grammar panel on focused field"
+    }
+  },
+  "options_page": "src/popup/index.html",
+  "background": { "service_worker": "src/background/index.js", "type": "module" },
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": { "16": "icons/icon-16.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
+  "web_accessible_resources": [{ "resources": ["icons/icon-48.png"], "matches": ["<all_urls>"] }]
+}

@@ -12,7 +12,6 @@ export const DEFAULT_CONFIG: Config = {
   language: 'auto',
   uiLanguage: 'en',
   uiTheme: 'dark',
-  disabledDomains: [],
   manualOnly: false,
   trustedDomains: [],
 }
@@ -22,7 +21,6 @@ export function mergeConfig(stored: Partial<Config>): Config {
     ...DEFAULT_CONFIG,
     ...stored,
     providers: stored.providers ?? DEFAULT_CONFIG.providers,
-    disabledDomains: stored.disabledDomains ?? DEFAULT_CONFIG.disabledDomains,
     trustedDomains: stored.trustedDomains ?? DEFAULT_CONFIG.trustedDomains,
   }
 }

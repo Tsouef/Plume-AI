@@ -18,14 +18,6 @@ One-click copy that applies all grammar corrections in memory and puts the fully
 
 ## Known Gaps
 
-### Subdomain support for disabled domains
-
-`disabledDomains` currently does an exact `hostname` match. Disabling `google.com` does not disable `mail.google.com`. Fix: check if the current hostname ends with `.{domain}` or equals `{domain}` when testing against each entry.
-
-### Wildcard domain patterns (`*.google.com`)
-
-Allow users to enter `*.google.com` in the disabled domains list to match all subdomains at once. Requires replacing the exact string comparison with a simple glob/pattern matcher. Builds on the subdomain support fix above.
-
 ## Tech Debt
 
 ### Config schema versioning

@@ -16,8 +16,6 @@
     "themeDark": "Donker",
     "themeLight": "Licht",
     "autoDetect": "Automatisch detecteren",
-    "disabledSites": "Uitgeschakelde sites",
-    "addBtn": "+ Toevoegen",
     "testConnection": "Testen",
     "testConnectionOk": "Verbinding OK",
     "testConnectionError": "Verbinding mislukt",

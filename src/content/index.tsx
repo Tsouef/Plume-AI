@@ -8,7 +8,6 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 async function main() {
   const config = await getConfig().catch(() => DEFAULT_CONFIG)
 
-  if (config.disabledDomains.includes(window.location.hostname)) return
   if (document.getElementById('plume-ai-root')) return
 
   const host = document.createElement('div')

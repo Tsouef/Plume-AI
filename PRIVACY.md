@@ -81,10 +81,10 @@ Please review the privacy policy of whichever provider you choose before using t
 
 ## Open Source
 
-Plume AI is open source. You can review the source code at: [GitHub repository](https://github.com/tsouef/plume-ai) (replace with actual URL if different).
+Plume AI is open source. You can review the source code at: [GitHub repository](https://github.com/tsouef/plume-ai).
 
 ## Contact
 
 If you have privacy questions about the extension, contact:
 
-**plume-ai@tsouef.dev**
+**souef.thibault@gmail.com**

@@ -16,8 +16,6 @@
     "themeDark": "深色",
     "themeLight": "浅色",
     "autoDetect": "自动检测",
-    "disabledSites": "已禁用的网站",
-    "addBtn": "+ 添加",
     "testConnection": "测试",
     "testConnectionOk": "连接正常",
     "testConnectionError": "连接失败",

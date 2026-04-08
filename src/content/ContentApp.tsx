@@ -61,8 +61,6 @@ export function ContentApp({ config: initialConfig }: ContentAppProps) {
     }
   }, [isPanelOpen, activeField, openPanel])
 
-  if (config.disabledDomains.includes(window.location.hostname)) return null
-
   return (
     <MotionConfig reducedMotion="user">
       <AnimatePresence>
