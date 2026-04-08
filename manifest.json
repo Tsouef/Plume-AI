@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Plume AI",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "On-demand grammar checking and AI rewriting for any web text field",
   "permissions": ["storage", "scripting", "activeTab", "tabs"],
   "optional_host_permissions": ["<all_urls>"],
