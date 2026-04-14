@@ -2,16 +2,26 @@
   <img src="public/icons/icon-128.png" alt="Plume AI" width="96" />
 </p>
 
-# Plume AI
+# 🪶 Plume AI
 
-<!-- Store badges (uncomment and replace IDs after publication):
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/EXTENSION_ID?label=Chrome%20Web%20Store)](https://chrome.google.com/webstore/detail/EXTENSION_ID)
-[![Firefox Add-on](https://img.shields.io/amo/v/plume-ai@tsouef.dev?label=Firefox%20Add-ons)](https://addons.mozilla.org/firefox/addon/plume-ai/)
--->
+> **Stop copy-pasting into ChatGPT. Bring your own AI models directly into any text field on the web.**
 
-A browser extension (Chrome + Firefox) that brings AI-powered grammar checking, rewriting, and translation directly into any text field on the web — no copy-pasting, no context switching.
+[![GitHub stars](https://img.shields.io/github/stars/Tsouef/Plume-AI?style=flat-square&color=ffd700)](https://github.com/Tsouef/Plume-AI/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Privacy: Local First](https://img.shields.io/badge/Privacy-Local--First-green?style=flat-square)](#privacy)
+[![A11y: WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA-orange?style=flat-square)](#accessibility)
 
-Works with **Gemini, Claude, OpenAI, Mistral, and Ollama**. Pick the provider and model that fits your setup.
+I built Plume AI because I was tired of the "context switch" — opening a new tab, pasting text, asking for a grammar check, and pasting it back. I wanted something that stays out of the way until I need it.
+
+---
+
+## ✨ Why Plume AI?
+
+- **🔌 You own the brain:** No monthly subscriptions. Connect your own API key (Gemini, Claude, OpenAI, Mistral) or run it **100% locally with Ollama**.
+- **🛡️ Privacy isn't an afterthought:** Your text is anonymized (emails/phones stripped) before it ever hits an API. The original text is restored after the check.
+- **🌍 Native explanations:** It explains grammar mistakes in _your_ native language, even if you're writing in another one. 12 UI languages supported.
+- **♿ Built for everyone:** Fully accessible (WCAG 2.1 AA) and keyboard-friendly. No mouse needed.
+- **⚡ Zero style-clash:** Injected via Shadow DOM to ensure it never breaks the layout of the website you are visiting.
 
 ---
 
@@ -80,8 +90,8 @@ Built to WCAG 2.1 AA:
 
 ### Install from store
 
-- **Chrome**: Chrome Web Store link will be available after publication
-- **Firefox**: Firefox Add-ons link will be available after publication
+- **Chrome**: https://chromewebstore.google.com/detail/plume-ai/bdhogmeklpmmjogifgbkkblkbacdjaco
+- **Firefox**: https://addons.mozilla.org/en-US/firefox/addon/plume-ai/
 
 ### Chrome
 
